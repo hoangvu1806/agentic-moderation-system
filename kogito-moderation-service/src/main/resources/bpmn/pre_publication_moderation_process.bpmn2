@@ -1,0 +1,802 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<bpmn2:definitions xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:drools="http://www.jboss.org/drools" id="pre-publication-moderation-definitions" targetNamespace="https://dentamind.local/bpmn/content-moderation">
+  <bpmn2:itemDefinition id="ItemDefinition_String" structureRef="java.lang.String" />
+  <bpmn2:itemDefinition id="ItemDefinition_Number" structureRef="java.lang.Double" />
+  <bpmn2:itemDefinition id="ItemDefinition_Boolean" structureRef="java.lang.Boolean" />
+  <bpmn2:process id="pre_publication_moderation_process" drools:packageName="com.dentamind.moderation" drools:version="1.0" name="Pre-Publication Moderation Process" isExecutable="true" processType="Public">
+    <bpmn2:property id="content_id" name="content_id" itemSubjectRef="ItemDefinition_String" />
+    <bpmn2:property id="evidence_id" name="evidence_id" itemSubjectRef="ItemDefinition_String" />
+    <bpmn2:property id="detected_domain" name="detected_domain" itemSubjectRef="ItemDefinition_String" />
+    <bpmn2:property id="domain_confidence" name="domain_confidence" itemSubjectRef="ItemDefinition_Number" />
+    <bpmn2:property id="analysis_profile" name="analysis_profile" itemSubjectRef="ItemDefinition_String" />
+    <bpmn2:property id="content_prompt_profile" name="content_prompt_profile" itemSubjectRef="ItemDefinition_String" />
+    <bpmn2:property id="image_prompt_profile" name="image_prompt_profile" itemSubjectRef="ItemDefinition_String" />
+    <bpmn2:property id="requires_domain_review" name="requires_domain_review" itemSubjectRef="ItemDefinition_Boolean" />
+    <bpmn2:property id="has_image" name="has_image" itemSubjectRef="ItemDefinition_Boolean" />
+    <bpmn2:property id="domain_dmn" name="domain_dmn" itemSubjectRef="ItemDefinition_String" />
+    <bpmn2:property id="dmn_decision" name="dmn_decision" itemSubjectRef="ItemDefinition_String" />
+    <bpmn2:property id="moderation_status" name="moderation_status" itemSubjectRef="ItemDefinition_String" />
+    <bpmn2:property id="toxicity_score" name="toxicity_score" itemSubjectRef="ItemDefinition_Number" />
+    <bpmn2:property id="spam_score" name="spam_score" itemSubjectRef="ItemDefinition_Number" />
+    <bpmn2:property id="scam_score" name="scam_score" itemSubjectRef="ItemDefinition_Number" />
+    <bpmn2:property id="threat_score" name="threat_score" itemSubjectRef="ItemDefinition_Number" />
+    <bpmn2:property id="hate_score" name="hate_score" itemSubjectRef="ItemDefinition_Number" />
+    <bpmn2:property id="medical_claim_score" name="medical_claim_score" itemSubjectRef="ItemDefinition_Number" />
+    <bpmn2:property id="financial_risk_score" name="financial_risk_score" itemSubjectRef="ItemDefinition_Number" />
+    <bpmn2:property id="image_risk_score" name="image_risk_score" itemSubjectRef="ItemDefinition_Number" />
+    <bpmn2:property id="academic_integrity_score" name="academic_integrity_score" itemSubjectRef="ItemDefinition_Number" />
+    <bpmn2:property id="credential_fraud_score" name="credential_fraud_score" itemSubjectRef="ItemDefinition_Number" />
+    <bpmn2:property id="phishing_score" name="phishing_score" itemSubjectRef="ItemDefinition_Number" />
+    <bpmn2:property id="counterfeit_score" name="counterfeit_score" itemSubjectRef="ItemDefinition_Number" />
+    <bpmn2:property id="off_platform_payment_score" name="off_platform_payment_score" itemSubjectRef="ItemDefinition_Number" />
+    <bpmn2:property id="fake_listing_score" name="fake_listing_score" itemSubjectRef="ItemDefinition_Number" />
+    <bpmn2:property id="unrealistic_return_score" name="unrealistic_return_score" itemSubjectRef="ItemDefinition_Number" />
+    <bpmn2:property id="deposit_risk_score" name="deposit_risk_score" itemSubjectRef="ItemDefinition_Number" />
+    <bpmn2:property id="discrimination_score" name="discrimination_score" itemSubjectRef="ItemDefinition_Number" />
+    <bpmn2:property id="unsafe_medical_advice_score" name="unsafe_medical_advice_score" itemSubjectRef="ItemDefinition_Number" />
+    <bpmn2:property id="emergency_risk_score" name="emergency_risk_score" itemSubjectRef="ItemDefinition_Number" />
+    <bpmn2:property id="confidential_data_score" name="confidential_data_score" itemSubjectRef="ItemDefinition_Number" />
+    <bpmn2:property id="insider_threat_score" name="insider_threat_score" itemSubjectRef="ItemDefinition_Number" />
+    <bpmn2:property id="is_repeat_offender" name="is_repeat_offender" itemSubjectRef="ItemDefinition_Boolean" />
+    <bpmn2:startEvent id="StartEvent_ContentSubmitted" name="Content submitted">
+      <bpmn2:outgoing>Flow_Start_To_SetPending</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:endEvent id="EndEvent_ModerationCompleted" name="Moderation completed">
+      <bpmn2:incoming>Flow_EndJoin_To_End</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:exclusiveGateway id="Gateway_DomainConfidence" name="Domain profile usable?" gatewayDirection="Diverging" default="Flow_DomainConfidence_To_DomainRouting">
+      <bpmn2:incoming>Flow_SetPending_To_DomainConfidence</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_DomainConfidence_To_ManualReview</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_DomainConfidence_To_DomainRouting</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:exclusiveGateway id="Gateway_DomainRouting" name="Route to domain DMN" gatewayDirection="Diverging" default="Flow_DomainRouting_To_ManualReview">
+      <bpmn2:incoming>Flow_DomainConfidence_To_DomainRouting</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_DomainRouting_To_EdTechName</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_DomainRouting_To_EcommerceName</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_DomainRouting_To_RealEstateName</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_DomainRouting_To_HealthcareName</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_DomainRouting_To_EnterpriseHrName</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_DomainRouting_To_ManualReview</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:exclusiveGateway id="Gateway_DmnJoin" name="Domain DMN completed" gatewayDirection="Converging">
+      <bpmn2:incoming>Flow_InvokeEdTech_To_DmnJoin</bpmn2:incoming>
+      <bpmn2:incoming>Flow_InvokeEcommerce_To_DmnJoin</bpmn2:incoming>
+      <bpmn2:incoming>Flow_InvokeRealEstate_To_DmnJoin</bpmn2:incoming>
+      <bpmn2:incoming>Flow_InvokeHealthcare_To_DmnJoin</bpmn2:incoming>
+      <bpmn2:incoming>Flow_InvokeEnterpriseHr_To_DmnJoin</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_DmnJoin_To_DecisionGateway</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:exclusiveGateway id="Gateway_ModerationDecision" name="Route by DMN decision" gatewayDirection="Diverging" default="Flow_DecisionGateway_To_ManualReview">
+      <bpmn2:incoming>Flow_DmnJoin_To_DecisionGateway</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_DecisionGateway_To_Published</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_DecisionGateway_To_PublishedWithWarning</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_DecisionGateway_To_Rejected</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_DecisionGateway_To_ManualReview</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:exclusiveGateway id="Gateway_ManualReviewJoin" name="Manual review required" gatewayDirection="Converging">
+      <bpmn2:incoming>Flow_DomainConfidence_To_ManualReview</bpmn2:incoming>
+      <bpmn2:incoming>Flow_DomainRouting_To_ManualReview</bpmn2:incoming>
+      <bpmn2:incoming>Flow_DecisionGateway_To_ManualReview</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_ManualReviewJoin_To_SetManualReview</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:exclusiveGateway id="Gateway_EndJoin" name="Final status joined" gatewayDirection="Converging">
+      <bpmn2:incoming>Flow_Published_To_EndJoin</bpmn2:incoming>
+      <bpmn2:incoming>Flow_PublishedWithWarning_To_EndJoin</bpmn2:incoming>
+      <bpmn2:incoming>Flow_Rejected_To_EndJoin</bpmn2:incoming>
+      <bpmn2:incoming>Flow_ManualReview_To_EndJoin</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_EndJoin_To_End</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:scriptTask id="Task_SetPendingModeration" name="Set status: PENDING_MODERATION" scriptFormat="http://www.java.com/java">
+      <bpmn2:incoming>Flow_Start_To_SetPending</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_SetPending_To_DomainConfidence</bpmn2:outgoing>
+      <bpmn2:script>
+kcontext.setVariable(&quot;moderation_status&quot;, &quot;PENDING_MODERATION&quot;);
+kcontext.setVariable(&quot;dmn_decision&quot;, null);
+if (kcontext.getVariable(&quot;is_repeat_offender&quot;) == null) {
+  kcontext.setVariable(&quot;is_repeat_offender&quot;, false);
+}
+      </bpmn2:script>
+    </bpmn2:scriptTask>
+    <bpmn2:scriptTask id="Task_SetEdTechDmnName" name="Select EdTech DMN" scriptFormat="http://www.java.com/java">
+      <bpmn2:incoming>Flow_DomainRouting_To_EdTechName</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_EdTechName_To_InvokeEdTech</bpmn2:outgoing>
+      <bpmn2:script>kcontext.setVariable(&quot;domain_dmn&quot;, &quot;EdTechModerationDecision&quot;);</bpmn2:script>
+    </bpmn2:scriptTask>
+    <bpmn2:scriptTask id="Task_SetEcommerceDmnName" name="Select Ecommerce DMN" scriptFormat="http://www.java.com/java">
+      <bpmn2:incoming>Flow_DomainRouting_To_EcommerceName</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_EcommerceName_To_InvokeEcommerce</bpmn2:outgoing>
+      <bpmn2:script>kcontext.setVariable(&quot;domain_dmn&quot;, &quot;EcommerceModerationDecision&quot;);</bpmn2:script>
+    </bpmn2:scriptTask>
+    <bpmn2:scriptTask id="Task_SetRealEstateDmnName" name="Select Real Estate DMN" scriptFormat="http://www.java.com/java">
+      <bpmn2:incoming>Flow_DomainRouting_To_RealEstateName</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_RealEstateName_To_InvokeRealEstate</bpmn2:outgoing>
+      <bpmn2:script>kcontext.setVariable(&quot;domain_dmn&quot;, &quot;RealEstateModerationDecision&quot;);</bpmn2:script>
+    </bpmn2:scriptTask>
+    <bpmn2:scriptTask id="Task_SetHealthcareDmnName" name="Select Healthcare DMN" scriptFormat="http://www.java.com/java">
+      <bpmn2:incoming>Flow_DomainRouting_To_HealthcareName</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_HealthcareName_To_InvokeHealthcare</bpmn2:outgoing>
+      <bpmn2:script>kcontext.setVariable(&quot;domain_dmn&quot;, &quot;HealthcareModerationDecision&quot;);</bpmn2:script>
+    </bpmn2:scriptTask>
+    <bpmn2:scriptTask id="Task_SetEnterpriseHrDmnName" name="Select Enterprise HR DMN" scriptFormat="http://www.java.com/java">
+      <bpmn2:incoming>Flow_DomainRouting_To_EnterpriseHrName</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_EnterpriseHrName_To_InvokeEnterpriseHr</bpmn2:outgoing>
+      <bpmn2:script>kcontext.setVariable(&quot;domain_dmn&quot;, &quot;EnterpriseHrModerationDecision&quot;);</bpmn2:script>
+    </bpmn2:scriptTask>
+    <bpmn2:scriptTask id="Task_SetPublished" name="Set status: PUBLISHED" scriptFormat="http://www.java.com/java">
+      <bpmn2:incoming>Flow_DecisionGateway_To_Published</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_Published_To_EndJoin</bpmn2:outgoing>
+      <bpmn2:script>kcontext.setVariable(&quot;moderation_status&quot;, &quot;PUBLISHED&quot;);</bpmn2:script>
+    </bpmn2:scriptTask>
+    <bpmn2:scriptTask id="Task_SetPublishedWithWarning" name="Set status: PUBLISHED_WITH_WARNING" scriptFormat="http://www.java.com/java">
+      <bpmn2:incoming>Flow_DecisionGateway_To_PublishedWithWarning</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_PublishedWithWarning_To_EndJoin</bpmn2:outgoing>
+      <bpmn2:script>kcontext.setVariable(&quot;moderation_status&quot;, &quot;PUBLISHED_WITH_WARNING&quot;);</bpmn2:script>
+    </bpmn2:scriptTask>
+    <bpmn2:scriptTask id="Task_SetRejected" name="Set status: REJECTED" scriptFormat="http://www.java.com/java">
+      <bpmn2:incoming>Flow_DecisionGateway_To_Rejected</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_Rejected_To_EndJoin</bpmn2:outgoing>
+      <bpmn2:script>kcontext.setVariable(&quot;moderation_status&quot;, &quot;REJECTED&quot;);</bpmn2:script>
+    </bpmn2:scriptTask>
+    <bpmn2:scriptTask id="Task_SetManualReview" name="Set status: PENDING_HUMAN_REVIEW" scriptFormat="http://www.java.com/java">
+      <bpmn2:incoming>Flow_ManualReviewJoin_To_SetManualReview</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_ManualReview_To_EndJoin</bpmn2:outgoing>
+      <bpmn2:script>
+kcontext.setVariable(&quot;moderation_status&quot;, &quot;PENDING_HUMAN_REVIEW&quot;);
+if (kcontext.getVariable(&quot;dmn_decision&quot;) == null) {
+  kcontext.setVariable(&quot;dmn_decision&quot;, &quot;MANUAL_REVIEW&quot;);
+}
+if (kcontext.getVariable(&quot;domain_dmn&quot;) == null) {
+  kcontext.setVariable(&quot;domain_dmn&quot;, &quot;NONE&quot;);
+}
+      </bpmn2:script>
+    </bpmn2:scriptTask>
+    <bpmn2:businessRuleTask id="Task_InvokeEdTechDmn" name="Invoke EdTechModerationDecision.dmn" implementation="http://www.jboss.org/drools/dmn">
+      <bpmn2:incoming>Flow_EdTechName_To_InvokeEdTech</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_InvokeEdTech_To_DmnJoin</bpmn2:outgoing>
+      <bpmn2:ioSpecification>
+        <bpmn2:dataInput id="Task_InvokeEdTechDmn_namespaceInput" drools:dtype="java.lang.String" itemSubjectRef="ItemDefinition_String" name="namespace" />
+        <bpmn2:dataInput id="Task_InvokeEdTechDmn_modelInput" drools:dtype="java.lang.String" itemSubjectRef="ItemDefinition_String" name="model" />
+        <bpmn2:dataInput id="Task_InvokeEdTechDmn_decisionInput" drools:dtype="java.lang.String" itemSubjectRef="ItemDefinition_String" name="decision" />
+        <bpmn2:dataInput id="Task_InvokeEdTechDmn_academic_integrity_scoreInput" drools:dtype="java.lang.Double" itemSubjectRef="ItemDefinition_Number" name="academic_integrity_score" />
+        <bpmn2:dataInput id="Task_InvokeEdTechDmn_credential_fraud_scoreInput" drools:dtype="java.lang.Double" itemSubjectRef="ItemDefinition_Number" name="credential_fraud_score" />
+        <bpmn2:dataInput id="Task_InvokeEdTechDmn_spam_scoreInput" drools:dtype="java.lang.Double" itemSubjectRef="ItemDefinition_Number" name="spam_score" />
+        <bpmn2:dataInput id="Task_InvokeEdTechDmn_toxicity_scoreInput" drools:dtype="java.lang.Double" itemSubjectRef="ItemDefinition_Number" name="toxicity_score" />
+        <bpmn2:dataInput id="Task_InvokeEdTechDmn_is_repeat_offenderInput" drools:dtype="java.lang.Boolean" itemSubjectRef="ItemDefinition_Boolean" name="is_repeat_offender" />
+        <bpmn2:dataOutput id="Task_InvokeEdTechDmn_decisionOutput" drools:dtype="java.lang.String" itemSubjectRef="ItemDefinition_String" name="EdTechModerationDecision" />
+        <bpmn2:inputSet>
+          <bpmn2:dataInputRefs>Task_InvokeEdTechDmn_namespaceInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeEdTechDmn_modelInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeEdTechDmn_decisionInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeEdTechDmn_academic_integrity_scoreInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeEdTechDmn_credential_fraud_scoreInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeEdTechDmn_spam_scoreInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeEdTechDmn_toxicity_scoreInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeEdTechDmn_is_repeat_offenderInput</bpmn2:dataInputRefs>
+        </bpmn2:inputSet>
+        <bpmn2:outputSet>
+          <bpmn2:dataOutputRefs>Task_InvokeEdTechDmn_decisionOutput</bpmn2:dataOutputRefs>
+        </bpmn2:outputSet>
+      </bpmn2:ioSpecification>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:targetRef>Task_InvokeEdTechDmn_namespaceInput</bpmn2:targetRef>
+        <bpmn2:assignment>
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression">https://dentamind.local/dmn/edtech-moderation</bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression">Task_InvokeEdTechDmn_namespaceInput</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:targetRef>Task_InvokeEdTechDmn_modelInput</bpmn2:targetRef>
+        <bpmn2:assignment>
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression">EdTechModerationDecision</bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression">Task_InvokeEdTechDmn_modelInput</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:targetRef>Task_InvokeEdTechDmn_decisionInput</bpmn2:targetRef>
+        <bpmn2:assignment>
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression">EdTechModerationDecision</bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression">Task_InvokeEdTechDmn_decisionInput</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>academic_integrity_score</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeEdTechDmn_academic_integrity_scoreInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>credential_fraud_score</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeEdTechDmn_credential_fraud_scoreInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>spam_score</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeEdTechDmn_spam_scoreInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>toxicity_score</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeEdTechDmn_toxicity_scoreInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>is_repeat_offender</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeEdTechDmn_is_repeat_offenderInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataOutputAssociation>
+        <bpmn2:sourceRef>Task_InvokeEdTechDmn_decisionOutput</bpmn2:sourceRef>
+        <bpmn2:targetRef>dmn_decision</bpmn2:targetRef>
+      </bpmn2:dataOutputAssociation>
+    </bpmn2:businessRuleTask>
+    <bpmn2:businessRuleTask id="Task_InvokeEcommerceDmn" name="Invoke EcommerceModerationDecision.dmn" implementation="http://www.jboss.org/drools/dmn">
+      <bpmn2:incoming>Flow_EcommerceName_To_InvokeEcommerce</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_InvokeEcommerce_To_DmnJoin</bpmn2:outgoing>
+      <bpmn2:ioSpecification>
+        <bpmn2:dataInput id="Task_InvokeEcommerceDmn_namespaceInput" drools:dtype="java.lang.String" itemSubjectRef="ItemDefinition_String" name="namespace" />
+        <bpmn2:dataInput id="Task_InvokeEcommerceDmn_modelInput" drools:dtype="java.lang.String" itemSubjectRef="ItemDefinition_String" name="model" />
+        <bpmn2:dataInput id="Task_InvokeEcommerceDmn_decisionInput" drools:dtype="java.lang.String" itemSubjectRef="ItemDefinition_String" name="decision" />
+        <bpmn2:dataInput id="Task_InvokeEcommerceDmn_phishing_scoreInput" drools:dtype="java.lang.Double" itemSubjectRef="ItemDefinition_Number" name="phishing_score" />
+        <bpmn2:dataInput id="Task_InvokeEcommerceDmn_counterfeit_scoreInput" drools:dtype="java.lang.Double" itemSubjectRef="ItemDefinition_Number" name="counterfeit_score" />
+        <bpmn2:dataInput id="Task_InvokeEcommerceDmn_off_platform_payment_scoreInput" drools:dtype="java.lang.Double" itemSubjectRef="ItemDefinition_Number" name="off_platform_payment_score" />
+        <bpmn2:dataInput id="Task_InvokeEcommerceDmn_scam_scoreInput" drools:dtype="java.lang.Double" itemSubjectRef="ItemDefinition_Number" name="scam_score" />
+        <bpmn2:dataInput id="Task_InvokeEcommerceDmn_image_risk_scoreInput" drools:dtype="java.lang.Double" itemSubjectRef="ItemDefinition_Number" name="image_risk_score" />
+        <bpmn2:dataInput id="Task_InvokeEcommerceDmn_is_repeat_offenderInput" drools:dtype="java.lang.Boolean" itemSubjectRef="ItemDefinition_Boolean" name="is_repeat_offender" />
+        <bpmn2:dataOutput id="Task_InvokeEcommerceDmn_decisionOutput" drools:dtype="java.lang.String" itemSubjectRef="ItemDefinition_String" name="EcommerceModerationDecision" />
+        <bpmn2:inputSet>
+          <bpmn2:dataInputRefs>Task_InvokeEcommerceDmn_namespaceInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeEcommerceDmn_modelInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeEcommerceDmn_decisionInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeEcommerceDmn_phishing_scoreInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeEcommerceDmn_counterfeit_scoreInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeEcommerceDmn_off_platform_payment_scoreInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeEcommerceDmn_scam_scoreInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeEcommerceDmn_image_risk_scoreInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeEcommerceDmn_is_repeat_offenderInput</bpmn2:dataInputRefs>
+        </bpmn2:inputSet>
+        <bpmn2:outputSet>
+          <bpmn2:dataOutputRefs>Task_InvokeEcommerceDmn_decisionOutput</bpmn2:dataOutputRefs>
+        </bpmn2:outputSet>
+      </bpmn2:ioSpecification>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:targetRef>Task_InvokeEcommerceDmn_namespaceInput</bpmn2:targetRef>
+        <bpmn2:assignment>
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression">https://dentamind.local/dmn/ecommerce-moderation</bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression">Task_InvokeEcommerceDmn_namespaceInput</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:targetRef>Task_InvokeEcommerceDmn_modelInput</bpmn2:targetRef>
+        <bpmn2:assignment>
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression">EcommerceModerationDecision</bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression">Task_InvokeEcommerceDmn_modelInput</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:targetRef>Task_InvokeEcommerceDmn_decisionInput</bpmn2:targetRef>
+        <bpmn2:assignment>
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression">EcommerceModerationDecision</bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression">Task_InvokeEcommerceDmn_decisionInput</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>phishing_score</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeEcommerceDmn_phishing_scoreInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>counterfeit_score</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeEcommerceDmn_counterfeit_scoreInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>off_platform_payment_score</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeEcommerceDmn_off_platform_payment_scoreInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>scam_score</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeEcommerceDmn_scam_scoreInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>image_risk_score</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeEcommerceDmn_image_risk_scoreInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>is_repeat_offender</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeEcommerceDmn_is_repeat_offenderInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataOutputAssociation>
+        <bpmn2:sourceRef>Task_InvokeEcommerceDmn_decisionOutput</bpmn2:sourceRef>
+        <bpmn2:targetRef>dmn_decision</bpmn2:targetRef>
+      </bpmn2:dataOutputAssociation>
+    </bpmn2:businessRuleTask>
+    <bpmn2:businessRuleTask id="Task_InvokeRealEstateDmn" name="Invoke RealEstateModerationDecision.dmn" implementation="http://www.jboss.org/drools/dmn">
+      <bpmn2:incoming>Flow_RealEstateName_To_InvokeRealEstate</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_InvokeRealEstate_To_DmnJoin</bpmn2:outgoing>
+      <bpmn2:ioSpecification>
+        <bpmn2:dataInput id="Task_InvokeRealEstateDmn_namespaceInput" drools:dtype="java.lang.String" itemSubjectRef="ItemDefinition_String" name="namespace" />
+        <bpmn2:dataInput id="Task_InvokeRealEstateDmn_modelInput" drools:dtype="java.lang.String" itemSubjectRef="ItemDefinition_String" name="model" />
+        <bpmn2:dataInput id="Task_InvokeRealEstateDmn_decisionInput" drools:dtype="java.lang.String" itemSubjectRef="ItemDefinition_String" name="decision" />
+        <bpmn2:dataInput id="Task_InvokeRealEstateDmn_fake_listing_scoreInput" drools:dtype="java.lang.Double" itemSubjectRef="ItemDefinition_Number" name="fake_listing_score" />
+        <bpmn2:dataInput id="Task_InvokeRealEstateDmn_unrealistic_return_scoreInput" drools:dtype="java.lang.Double" itemSubjectRef="ItemDefinition_Number" name="unrealistic_return_score" />
+        <bpmn2:dataInput id="Task_InvokeRealEstateDmn_deposit_risk_scoreInput" drools:dtype="java.lang.Double" itemSubjectRef="ItemDefinition_Number" name="deposit_risk_score" />
+        <bpmn2:dataInput id="Task_InvokeRealEstateDmn_discrimination_scoreInput" drools:dtype="java.lang.Double" itemSubjectRef="ItemDefinition_Number" name="discrimination_score" />
+        <bpmn2:dataInput id="Task_InvokeRealEstateDmn_scam_scoreInput" drools:dtype="java.lang.Double" itemSubjectRef="ItemDefinition_Number" name="scam_score" />
+        <bpmn2:dataOutput id="Task_InvokeRealEstateDmn_decisionOutput" drools:dtype="java.lang.String" itemSubjectRef="ItemDefinition_String" name="RealEstateModerationDecision" />
+        <bpmn2:inputSet>
+          <bpmn2:dataInputRefs>Task_InvokeRealEstateDmn_namespaceInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeRealEstateDmn_modelInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeRealEstateDmn_decisionInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeRealEstateDmn_fake_listing_scoreInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeRealEstateDmn_unrealistic_return_scoreInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeRealEstateDmn_deposit_risk_scoreInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeRealEstateDmn_discrimination_scoreInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeRealEstateDmn_scam_scoreInput</bpmn2:dataInputRefs>
+        </bpmn2:inputSet>
+        <bpmn2:outputSet>
+          <bpmn2:dataOutputRefs>Task_InvokeRealEstateDmn_decisionOutput</bpmn2:dataOutputRefs>
+        </bpmn2:outputSet>
+      </bpmn2:ioSpecification>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:targetRef>Task_InvokeRealEstateDmn_namespaceInput</bpmn2:targetRef>
+        <bpmn2:assignment>
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression">https://dentamind.local/dmn/real-estate-moderation</bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression">Task_InvokeRealEstateDmn_namespaceInput</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:targetRef>Task_InvokeRealEstateDmn_modelInput</bpmn2:targetRef>
+        <bpmn2:assignment>
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression">RealEstateModerationDecision</bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression">Task_InvokeRealEstateDmn_modelInput</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:targetRef>Task_InvokeRealEstateDmn_decisionInput</bpmn2:targetRef>
+        <bpmn2:assignment>
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression">RealEstateModerationDecision</bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression">Task_InvokeRealEstateDmn_decisionInput</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>fake_listing_score</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeRealEstateDmn_fake_listing_scoreInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>unrealistic_return_score</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeRealEstateDmn_unrealistic_return_scoreInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>deposit_risk_score</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeRealEstateDmn_deposit_risk_scoreInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>discrimination_score</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeRealEstateDmn_discrimination_scoreInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>scam_score</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeRealEstateDmn_scam_scoreInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataOutputAssociation>
+        <bpmn2:sourceRef>Task_InvokeRealEstateDmn_decisionOutput</bpmn2:sourceRef>
+        <bpmn2:targetRef>dmn_decision</bpmn2:targetRef>
+      </bpmn2:dataOutputAssociation>
+    </bpmn2:businessRuleTask>
+    <bpmn2:businessRuleTask id="Task_InvokeHealthcareDmn" name="Invoke HealthcareModerationDecision.dmn" implementation="http://www.jboss.org/drools/dmn">
+      <bpmn2:incoming>Flow_HealthcareName_To_InvokeHealthcare</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_InvokeHealthcare_To_DmnJoin</bpmn2:outgoing>
+      <bpmn2:ioSpecification>
+        <bpmn2:dataInput id="Task_InvokeHealthcareDmn_namespaceInput" drools:dtype="java.lang.String" itemSubjectRef="ItemDefinition_String" name="namespace" />
+        <bpmn2:dataInput id="Task_InvokeHealthcareDmn_modelInput" drools:dtype="java.lang.String" itemSubjectRef="ItemDefinition_String" name="model" />
+        <bpmn2:dataInput id="Task_InvokeHealthcareDmn_decisionInput" drools:dtype="java.lang.String" itemSubjectRef="ItemDefinition_String" name="decision" />
+        <bpmn2:dataInput id="Task_InvokeHealthcareDmn_unsafe_medical_advice_scoreInput" drools:dtype="java.lang.Double" itemSubjectRef="ItemDefinition_Number" name="unsafe_medical_advice_score" />
+        <bpmn2:dataInput id="Task_InvokeHealthcareDmn_emergency_risk_scoreInput" drools:dtype="java.lang.Double" itemSubjectRef="ItemDefinition_Number" name="emergency_risk_score" />
+        <bpmn2:dataInput id="Task_InvokeHealthcareDmn_medical_claim_scoreInput" drools:dtype="java.lang.Double" itemSubjectRef="ItemDefinition_Number" name="medical_claim_score" />
+        <bpmn2:dataInput id="Task_InvokeHealthcareDmn_scam_scoreInput" drools:dtype="java.lang.Double" itemSubjectRef="ItemDefinition_Number" name="scam_score" />
+        <bpmn2:dataInput id="Task_InvokeHealthcareDmn_toxicity_scoreInput" drools:dtype="java.lang.Double" itemSubjectRef="ItemDefinition_Number" name="toxicity_score" />
+        <bpmn2:dataOutput id="Task_InvokeHealthcareDmn_decisionOutput" drools:dtype="java.lang.String" itemSubjectRef="ItemDefinition_String" name="HealthcareModerationDecision" />
+        <bpmn2:inputSet>
+          <bpmn2:dataInputRefs>Task_InvokeHealthcareDmn_namespaceInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeHealthcareDmn_modelInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeHealthcareDmn_decisionInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeHealthcareDmn_unsafe_medical_advice_scoreInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeHealthcareDmn_emergency_risk_scoreInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeHealthcareDmn_medical_claim_scoreInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeHealthcareDmn_scam_scoreInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeHealthcareDmn_toxicity_scoreInput</bpmn2:dataInputRefs>
+        </bpmn2:inputSet>
+        <bpmn2:outputSet>
+          <bpmn2:dataOutputRefs>Task_InvokeHealthcareDmn_decisionOutput</bpmn2:dataOutputRefs>
+        </bpmn2:outputSet>
+      </bpmn2:ioSpecification>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:targetRef>Task_InvokeHealthcareDmn_namespaceInput</bpmn2:targetRef>
+        <bpmn2:assignment>
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression">https://dentamind.local/dmn/healthcare-moderation</bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression">Task_InvokeHealthcareDmn_namespaceInput</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:targetRef>Task_InvokeHealthcareDmn_modelInput</bpmn2:targetRef>
+        <bpmn2:assignment>
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression">HealthcareModerationDecision</bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression">Task_InvokeHealthcareDmn_modelInput</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:targetRef>Task_InvokeHealthcareDmn_decisionInput</bpmn2:targetRef>
+        <bpmn2:assignment>
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression">HealthcareModerationDecision</bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression">Task_InvokeHealthcareDmn_decisionInput</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>unsafe_medical_advice_score</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeHealthcareDmn_unsafe_medical_advice_scoreInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>emergency_risk_score</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeHealthcareDmn_emergency_risk_scoreInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>medical_claim_score</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeHealthcareDmn_medical_claim_scoreInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>scam_score</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeHealthcareDmn_scam_scoreInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>toxicity_score</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeHealthcareDmn_toxicity_scoreInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataOutputAssociation>
+        <bpmn2:sourceRef>Task_InvokeHealthcareDmn_decisionOutput</bpmn2:sourceRef>
+        <bpmn2:targetRef>dmn_decision</bpmn2:targetRef>
+      </bpmn2:dataOutputAssociation>
+    </bpmn2:businessRuleTask>
+    <bpmn2:businessRuleTask id="Task_InvokeEnterpriseHrDmn" name="Invoke EnterpriseHrModerationDecision.dmn" implementation="http://www.jboss.org/drools/dmn">
+      <bpmn2:incoming>Flow_EnterpriseHrName_To_InvokeEnterpriseHr</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_InvokeEnterpriseHr_To_DmnJoin</bpmn2:outgoing>
+      <bpmn2:ioSpecification>
+        <bpmn2:dataInput id="Task_InvokeEnterpriseHrDmn_namespaceInput" drools:dtype="java.lang.String" itemSubjectRef="ItemDefinition_String" name="namespace" />
+        <bpmn2:dataInput id="Task_InvokeEnterpriseHrDmn_modelInput" drools:dtype="java.lang.String" itemSubjectRef="ItemDefinition_String" name="model" />
+        <bpmn2:dataInput id="Task_InvokeEnterpriseHrDmn_decisionInput" drools:dtype="java.lang.String" itemSubjectRef="ItemDefinition_String" name="decision" />
+        <bpmn2:dataInput id="Task_InvokeEnterpriseHrDmn_confidential_data_scoreInput" drools:dtype="java.lang.Double" itemSubjectRef="ItemDefinition_Number" name="confidential_data_score" />
+        <bpmn2:dataInput id="Task_InvokeEnterpriseHrDmn_insider_threat_scoreInput" drools:dtype="java.lang.Double" itemSubjectRef="ItemDefinition_Number" name="insider_threat_score" />
+        <bpmn2:dataInput id="Task_InvokeEnterpriseHrDmn_toxicity_scoreInput" drools:dtype="java.lang.Double" itemSubjectRef="ItemDefinition_Number" name="toxicity_score" />
+        <bpmn2:dataInput id="Task_InvokeEnterpriseHrDmn_threat_scoreInput" drools:dtype="java.lang.Double" itemSubjectRef="ItemDefinition_Number" name="threat_score" />
+        <bpmn2:dataInput id="Task_InvokeEnterpriseHrDmn_is_repeat_offenderInput" drools:dtype="java.lang.Boolean" itemSubjectRef="ItemDefinition_Boolean" name="is_repeat_offender" />
+        <bpmn2:dataOutput id="Task_InvokeEnterpriseHrDmn_decisionOutput" drools:dtype="java.lang.String" itemSubjectRef="ItemDefinition_String" name="EnterpriseHrModerationDecision" />
+        <bpmn2:inputSet>
+          <bpmn2:dataInputRefs>Task_InvokeEnterpriseHrDmn_namespaceInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeEnterpriseHrDmn_modelInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeEnterpriseHrDmn_decisionInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeEnterpriseHrDmn_confidential_data_scoreInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeEnterpriseHrDmn_insider_threat_scoreInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeEnterpriseHrDmn_toxicity_scoreInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeEnterpriseHrDmn_threat_scoreInput</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>Task_InvokeEnterpriseHrDmn_is_repeat_offenderInput</bpmn2:dataInputRefs>
+        </bpmn2:inputSet>
+        <bpmn2:outputSet>
+          <bpmn2:dataOutputRefs>Task_InvokeEnterpriseHrDmn_decisionOutput</bpmn2:dataOutputRefs>
+        </bpmn2:outputSet>
+      </bpmn2:ioSpecification>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:targetRef>Task_InvokeEnterpriseHrDmn_namespaceInput</bpmn2:targetRef>
+        <bpmn2:assignment>
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression">https://dentamind.local/dmn/enterprise-hr-moderation</bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression">Task_InvokeEnterpriseHrDmn_namespaceInput</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:targetRef>Task_InvokeEnterpriseHrDmn_modelInput</bpmn2:targetRef>
+        <bpmn2:assignment>
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression">EnterpriseHrModerationDecision</bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression">Task_InvokeEnterpriseHrDmn_modelInput</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:targetRef>Task_InvokeEnterpriseHrDmn_decisionInput</bpmn2:targetRef>
+        <bpmn2:assignment>
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression">EnterpriseHrModerationDecision</bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression">Task_InvokeEnterpriseHrDmn_decisionInput</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>confidential_data_score</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeEnterpriseHrDmn_confidential_data_scoreInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>insider_threat_score</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeEnterpriseHrDmn_insider_threat_scoreInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>toxicity_score</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeEnterpriseHrDmn_toxicity_scoreInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>threat_score</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeEnterpriseHrDmn_threat_scoreInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation>
+        <bpmn2:sourceRef>is_repeat_offender</bpmn2:sourceRef>
+        <bpmn2:targetRef>Task_InvokeEnterpriseHrDmn_is_repeat_offenderInput</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataOutputAssociation>
+        <bpmn2:sourceRef>Task_InvokeEnterpriseHrDmn_decisionOutput</bpmn2:sourceRef>
+        <bpmn2:targetRef>dmn_decision</bpmn2:targetRef>
+      </bpmn2:dataOutputAssociation>
+    </bpmn2:businessRuleTask>
+    <bpmn2:sequenceFlow id="Flow_Start_To_SetPending" sourceRef="StartEvent_ContentSubmitted" targetRef="Task_SetPendingModeration" />
+    <bpmn2:sequenceFlow id="Flow_SetPending_To_DomainConfidence" sourceRef="Task_SetPendingModeration" targetRef="Gateway_DomainConfidence" />
+    <bpmn2:sequenceFlow id="Flow_DomainConfidence_To_ManualReview" name="low confidence or review required" sourceRef="Gateway_DomainConfidence" targetRef="Gateway_ManualReviewJoin">
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="http://www.java.com/java">return domain_confidence == null || domain_confidence &lt; 0.60 || requires_domain_review == true;</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="Flow_DomainConfidence_To_DomainRouting" name="domain accepted" sourceRef="Gateway_DomainConfidence" targetRef="Gateway_DomainRouting" />
+    <bpmn2:sequenceFlow id="Flow_DomainRouting_To_EdTechName" name="EDTECH" sourceRef="Gateway_DomainRouting" targetRef="Task_SetEdTechDmnName">
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="http://www.java.com/java">return &quot;EDTECH&quot;.equals(detected_domain);</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="Flow_DomainRouting_To_EcommerceName" name="ECOMMERCE" sourceRef="Gateway_DomainRouting" targetRef="Task_SetEcommerceDmnName">
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="http://www.java.com/java">return &quot;ECOMMERCE&quot;.equals(detected_domain);</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="Flow_DomainRouting_To_RealEstateName" name="REAL_ESTATE" sourceRef="Gateway_DomainRouting" targetRef="Task_SetRealEstateDmnName">
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="http://www.java.com/java">return &quot;REAL_ESTATE&quot;.equals(detected_domain);</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="Flow_DomainRouting_To_HealthcareName" name="HEALTHCARE" sourceRef="Gateway_DomainRouting" targetRef="Task_SetHealthcareDmnName">
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="http://www.java.com/java">return &quot;HEALTHCARE&quot;.equals(detected_domain);</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="Flow_DomainRouting_To_EnterpriseHrName" name="ENTERPRISE_HR" sourceRef="Gateway_DomainRouting" targetRef="Task_SetEnterpriseHrDmnName">
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="http://www.java.com/java">return &quot;ENTERPRISE_HR&quot;.equals(detected_domain);</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="Flow_DomainRouting_To_ManualReview" name="unknown domain" sourceRef="Gateway_DomainRouting" targetRef="Gateway_ManualReviewJoin" />
+    <bpmn2:sequenceFlow id="Flow_EdTechName_To_InvokeEdTech" sourceRef="Task_SetEdTechDmnName" targetRef="Task_InvokeEdTechDmn" />
+    <bpmn2:sequenceFlow id="Flow_EcommerceName_To_InvokeEcommerce" sourceRef="Task_SetEcommerceDmnName" targetRef="Task_InvokeEcommerceDmn" />
+    <bpmn2:sequenceFlow id="Flow_RealEstateName_To_InvokeRealEstate" sourceRef="Task_SetRealEstateDmnName" targetRef="Task_InvokeRealEstateDmn" />
+    <bpmn2:sequenceFlow id="Flow_HealthcareName_To_InvokeHealthcare" sourceRef="Task_SetHealthcareDmnName" targetRef="Task_InvokeHealthcareDmn" />
+    <bpmn2:sequenceFlow id="Flow_EnterpriseHrName_To_InvokeEnterpriseHr" sourceRef="Task_SetEnterpriseHrDmnName" targetRef="Task_InvokeEnterpriseHrDmn" />
+    <bpmn2:sequenceFlow id="Flow_InvokeEdTech_To_DmnJoin" sourceRef="Task_InvokeEdTechDmn" targetRef="Gateway_DmnJoin" />
+    <bpmn2:sequenceFlow id="Flow_InvokeEcommerce_To_DmnJoin" sourceRef="Task_InvokeEcommerceDmn" targetRef="Gateway_DmnJoin" />
+    <bpmn2:sequenceFlow id="Flow_InvokeRealEstate_To_DmnJoin" sourceRef="Task_InvokeRealEstateDmn" targetRef="Gateway_DmnJoin" />
+    <bpmn2:sequenceFlow id="Flow_InvokeHealthcare_To_DmnJoin" sourceRef="Task_InvokeHealthcareDmn" targetRef="Gateway_DmnJoin" />
+    <bpmn2:sequenceFlow id="Flow_InvokeEnterpriseHr_To_DmnJoin" sourceRef="Task_InvokeEnterpriseHrDmn" targetRef="Gateway_DmnJoin" />
+    <bpmn2:sequenceFlow id="Flow_DmnJoin_To_DecisionGateway" sourceRef="Gateway_DmnJoin" targetRef="Gateway_ModerationDecision" />
+    <bpmn2:sequenceFlow id="Flow_DecisionGateway_To_Published" name="ALLOW" sourceRef="Gateway_ModerationDecision" targetRef="Task_SetPublished">
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="http://www.java.com/java">return &quot;ALLOW&quot;.equals(dmn_decision);</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="Flow_DecisionGateway_To_PublishedWithWarning" name="WARN_ALLOW" sourceRef="Gateway_ModerationDecision" targetRef="Task_SetPublishedWithWarning">
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="http://www.java.com/java">return &quot;WARN_ALLOW&quot;.equals(dmn_decision);</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="Flow_DecisionGateway_To_Rejected" name="REJECT" sourceRef="Gateway_ModerationDecision" targetRef="Task_SetRejected">
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="http://www.java.com/java">return &quot;REJECT&quot;.equals(dmn_decision) || &quot;TEMP_BAN&quot;.equals(dmn_decision);</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="Flow_DecisionGateway_To_ManualReview" name="MANUAL_REVIEW / default" sourceRef="Gateway_ModerationDecision" targetRef="Gateway_ManualReviewJoin" />
+    <bpmn2:sequenceFlow id="Flow_ManualReviewJoin_To_SetManualReview" sourceRef="Gateway_ManualReviewJoin" targetRef="Task_SetManualReview" />
+    <bpmn2:sequenceFlow id="Flow_Published_To_EndJoin" sourceRef="Task_SetPublished" targetRef="Gateway_EndJoin" />
+    <bpmn2:sequenceFlow id="Flow_PublishedWithWarning_To_EndJoin" sourceRef="Task_SetPublishedWithWarning" targetRef="Gateway_EndJoin" />
+    <bpmn2:sequenceFlow id="Flow_Rejected_To_EndJoin" sourceRef="Task_SetRejected" targetRef="Gateway_EndJoin" />
+    <bpmn2:sequenceFlow id="Flow_ManualReview_To_EndJoin" sourceRef="Task_SetManualReview" targetRef="Gateway_EndJoin" />
+    <bpmn2:sequenceFlow id="Flow_EndJoin_To_End" sourceRef="Gateway_EndJoin" targetRef="EndEvent_ModerationCompleted" />
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_PrePublicationModeration">
+    <bpmndi:BPMNPlane id="BPMNPlane_PrePublicationModeration" bpmnElement="pre_publication_moderation_process">
+      <bpmndi:BPMNShape id="Shape_StartEvent_ContentSubmitted" bpmnElement="StartEvent_ContentSubmitted">
+        <dc:Bounds x="-160" y="280" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_SetPendingModeration" bpmnElement="Task_SetPendingModeration">
+        <dc:Bounds x="-40" y="260" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_DomainConfidence" bpmnElement="Gateway_DomainConfidence" isMarkerVisible="true">
+        <dc:Bounds x="220" y="280" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_DomainRouting" bpmnElement="Gateway_DomainRouting" isMarkerVisible="true">
+        <dc:Bounds x="380" y="280" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_SetEdTechDmnName" bpmnElement="Task_SetEdTechDmnName">
+        <dc:Bounds x="540" y="50" width="190" height="65" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_InvokeEdTechDmn" bpmnElement="Task_InvokeEdTechDmn">
+        <dc:Bounds x="800" y="50" width="260" height="65" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_SetEcommerceDmnName" bpmnElement="Task_SetEcommerceDmnName">
+        <dc:Bounds x="540" y="155" width="190" height="65" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_InvokeEcommerceDmn" bpmnElement="Task_InvokeEcommerceDmn">
+        <dc:Bounds x="800" y="155" width="260" height="65" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_SetRealEstateDmnName" bpmnElement="Task_SetRealEstateDmnName">
+        <dc:Bounds x="540" y="260" width="190" height="65" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_InvokeRealEstateDmn" bpmnElement="Task_InvokeRealEstateDmn">
+        <dc:Bounds x="800" y="260" width="260" height="65" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_SetHealthcareDmnName" bpmnElement="Task_SetHealthcareDmnName">
+        <dc:Bounds x="540" y="365" width="190" height="65" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_InvokeHealthcareDmn" bpmnElement="Task_InvokeHealthcareDmn">
+        <dc:Bounds x="800" y="365" width="260" height="65" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_SetEnterpriseHrDmnName" bpmnElement="Task_SetEnterpriseHrDmnName">
+        <dc:Bounds x="540" y="470" width="190" height="65" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_InvokeEnterpriseHrDmn" bpmnElement="Task_InvokeEnterpriseHrDmn">
+        <dc:Bounds x="800" y="470" width="260" height="65" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_DmnJoin" bpmnElement="Gateway_DmnJoin" isMarkerVisible="true">
+        <dc:Bounds x="1140" y="280" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_ModerationDecision" bpmnElement="Gateway_ModerationDecision" isMarkerVisible="true">
+        <dc:Bounds x="1260" y="280" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_ManualReviewJoin" bpmnElement="Gateway_ManualReviewJoin" isMarkerVisible="true">
+        <dc:Bounds x="900" y="680" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_SetPublished" bpmnElement="Task_SetPublished">
+        <dc:Bounds x="1430" y="110" width="220" height="65" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_SetPublishedWithWarning" bpmnElement="Task_SetPublishedWithWarning">
+        <dc:Bounds x="1430" y="225" width="220" height="65" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_SetRejected" bpmnElement="Task_SetRejected">
+        <dc:Bounds x="1430" y="340" width="220" height="65" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_SetManualReview" bpmnElement="Task_SetManualReview">
+        <dc:Bounds x="1430" y="570" width="220" height="65" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_EndJoin" bpmnElement="Gateway_EndJoin" isMarkerVisible="true">
+        <dc:Bounds x="1760" y="295" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndEvent_ModerationCompleted" bpmnElement="EndEvent_ModerationCompleted">
+        <dc:Bounds x="1900" y="302" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_Flow_Start_To_SetPending" bpmnElement="Flow_Start_To_SetPending">
+        <di:waypoint x="-124" y="298" />
+        <di:waypoint x="-40" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_SetPending_To_DomainConfidence" bpmnElement="Flow_SetPending_To_DomainConfidence">
+        <di:waypoint x="140" y="300" />
+        <di:waypoint x="220" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_DomainConfidence_To_ManualReview" bpmnElement="Flow_DomainConfidence_To_ManualReview">
+        <di:waypoint x="245" y="330" />
+        <di:waypoint x="250" y="710" />
+        <di:waypoint x="900" y="705" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_DomainConfidence_To_DomainRouting" bpmnElement="Flow_DomainConfidence_To_DomainRouting">
+        <di:waypoint x="270" y="305" />
+        <di:waypoint x="380" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_DomainRouting_To_EdTechName" bpmnElement="Flow_DomainRouting_To_EdTechName">
+        <di:waypoint x="405" y="280" />
+        <di:waypoint x="410" y="110" />
+        <di:waypoint x="540" y="82" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_DomainRouting_To_EcommerceName" bpmnElement="Flow_DomainRouting_To_EcommerceName">
+        <di:waypoint x="430" y="305" />
+        <di:waypoint x="485" y="305" />
+        <di:waypoint x="490" y="210" />
+        <di:waypoint x="540" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_DomainRouting_To_RealEstateName" bpmnElement="Flow_DomainRouting_To_RealEstateName">
+        <di:waypoint x="430" y="305" />
+        <di:waypoint x="540" y="293" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_DomainRouting_To_HealthcareName" bpmnElement="Flow_DomainRouting_To_HealthcareName">
+        <di:waypoint x="430" y="305" />
+        <di:waypoint x="485" y="305" />
+        <di:waypoint x="490" y="410" />
+        <di:waypoint x="540" y="398" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_DomainRouting_To_EnterpriseHrName" bpmnElement="Flow_DomainRouting_To_EnterpriseHrName">
+        <di:waypoint x="405" y="330" />
+        <di:waypoint x="410" y="530" />
+        <di:waypoint x="540" y="503" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_DomainRouting_To_ManualReview" bpmnElement="Flow_DomainRouting_To_ManualReview">
+        <di:waypoint x="405" y="330" />
+        <di:waypoint x="410" y="710" />
+        <di:waypoint x="900" y="705" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_EdTechName_To_InvokeEdTech" bpmnElement="Flow_EdTechName_To_InvokeEdTech">
+        <di:waypoint x="730" y="82" />
+        <di:waypoint x="800" y="82" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_EcommerceName_To_InvokeEcommerce" bpmnElement="Flow_EcommerceName_To_InvokeEcommerce">
+        <di:waypoint x="730" y="188" />
+        <di:waypoint x="800" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_RealEstateName_To_InvokeRealEstate" bpmnElement="Flow_RealEstateName_To_InvokeRealEstate">
+        <di:waypoint x="730" y="293" />
+        <di:waypoint x="800" y="293" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_HealthcareName_To_InvokeHealthcare" bpmnElement="Flow_HealthcareName_To_InvokeHealthcare">
+        <di:waypoint x="730" y="398" />
+        <di:waypoint x="800" y="398" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_EnterpriseHrName_To_InvokeEnterpriseHr" bpmnElement="Flow_EnterpriseHrName_To_InvokeEnterpriseHr">
+        <di:waypoint x="730" y="503" />
+        <di:waypoint x="800" y="503" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_InvokeEdTech_To_DmnJoin" bpmnElement="Flow_InvokeEdTech_To_DmnJoin">
+        <di:waypoint x="1060" y="82" />
+        <di:waypoint x="1100" y="110" />
+        <di:waypoint x="1100" y="310" />
+        <di:waypoint x="1140" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_InvokeEcommerce_To_DmnJoin" bpmnElement="Flow_InvokeEcommerce_To_DmnJoin">
+        <di:waypoint x="1060" y="188" />
+        <di:waypoint x="1100" y="210" />
+        <di:waypoint x="1100" y="310" />
+        <di:waypoint x="1140" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_InvokeRealEstate_To_DmnJoin" bpmnElement="Flow_InvokeRealEstate_To_DmnJoin">
+        <di:waypoint x="1060" y="293" />
+        <di:waypoint x="1100" y="310" />
+        <di:waypoint x="1140" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_InvokeHealthcare_To_DmnJoin" bpmnElement="Flow_InvokeHealthcare_To_DmnJoin">
+        <di:waypoint x="1060" y="398" />
+        <di:waypoint x="1100" y="410" />
+        <di:waypoint x="1100" y="360" />
+        <di:waypoint x="1100" y="310" />
+        <di:waypoint x="1140" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_InvokeEnterpriseHr_To_DmnJoin" bpmnElement="Flow_InvokeEnterpriseHr_To_DmnJoin">
+        <di:waypoint x="1060" y="503" />
+        <di:waypoint x="1100" y="530" />
+        <di:waypoint x="1100" y="310" />
+        <di:waypoint x="1140" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_DmnJoin_To_DecisionGateway" bpmnElement="Flow_DmnJoin_To_DecisionGateway">
+        <di:waypoint x="1190" y="305" />
+        <di:waypoint x="1260" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_DecisionGateway_To_Published" bpmnElement="Flow_DecisionGateway_To_Published">
+        <di:waypoint x="1285" y="280" />
+        <di:waypoint x="1290" y="170" />
+        <di:waypoint x="1430" y="143" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_DecisionGateway_To_PublishedWithWarning" bpmnElement="Flow_DecisionGateway_To_PublishedWithWarning">
+        <di:waypoint x="1310" y="305" />
+        <di:waypoint x="1360" y="310" />
+        <di:waypoint x="1360" y="270" />
+        <di:waypoint x="1430" y="258" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_DecisionGateway_To_Rejected" bpmnElement="Flow_DecisionGateway_To_Rejected">
+        <di:waypoint x="1310" y="305" />
+        <di:waypoint x="1360" y="310" />
+        <di:waypoint x="1360" y="390" />
+        <di:waypoint x="1430" y="373" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_DecisionGateway_To_ManualReview" bpmnElement="Flow_DecisionGateway_To_ManualReview">
+        <di:waypoint x="1285" y="330" />
+        <di:waypoint x="1285" y="705" />
+        <di:waypoint x="950" y="705" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_ManualReviewJoin_To_SetManualReview" bpmnElement="Flow_ManualReviewJoin_To_SetManualReview">
+        <di:waypoint x="950" y="705" />
+        <di:waypoint x="1360" y="705" />
+        <di:waypoint x="1360" y="630" />
+        <di:waypoint x="1430" y="603" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Published_To_EndJoin" bpmnElement="Flow_Published_To_EndJoin">
+        <di:waypoint x="1650" y="143" />
+        <di:waypoint x="1790" y="170" />
+        <di:waypoint x="1785" y="295" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_PublishedWithWarning_To_EndJoin" bpmnElement="Flow_PublishedWithWarning_To_EndJoin">
+        <di:waypoint x="1650" y="258" />
+        <di:waypoint x="1790" y="270" />
+        <di:waypoint x="1785" y="295" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Rejected_To_EndJoin" bpmnElement="Flow_Rejected_To_EndJoin">
+        <di:waypoint x="1650" y="373" />
+        <di:waypoint x="1790" y="390" />
+        <di:waypoint x="1785" y="373" />
+        <di:waypoint x="1785" y="345" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_ManualReview_To_EndJoin" bpmnElement="Flow_ManualReview_To_EndJoin">
+        <di:waypoint x="1650" y="603" />
+        <di:waypoint x="1790" y="630" />
+        <di:waypoint x="1785" y="345" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_EndJoin_To_End" bpmnElement="Flow_EndJoin_To_End">
+        <di:waypoint x="1810" y="320" />
+        <di:waypoint x="1900" y="320" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

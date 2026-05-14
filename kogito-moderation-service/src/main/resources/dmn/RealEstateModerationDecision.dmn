@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" id="real-estate-moderation-definitions" name="RealEstateModerationDecision" namespace="https://dentamind.local/dmn/real-estate-moderation">
+  <decision id="decision-real-estate-moderation" name="RealEstateModerationDecision">
+    <variable id="variable-real-estate-moderation" name="RealEstateModerationDecision" typeRef="string" />
+    <informationRequirement id="requirement-fake-listing-score">
+      <requiredInput href="#input-fake-listing-score" />
+    </informationRequirement>
+    <informationRequirement id="requirement-unrealistic-return-score">
+      <requiredInput href="#input-unrealistic-return-score" />
+    </informationRequirement>
+    <informationRequirement id="requirement-deposit-risk-score">
+      <requiredInput href="#input-deposit-risk-score" />
+    </informationRequirement>
+    <informationRequirement id="requirement-discrimination-score">
+      <requiredInput href="#input-discrimination-score" />
+    </informationRequirement>
+    <informationRequirement id="requirement-scam-score">
+      <requiredInput href="#input-scam-score" />
+    </informationRequirement>
+    <decisionTable id="decision-table-real-estate-moderation" hitPolicy="FIRST" preferredOrientation="Rule-as-Row">
+      <input id="input-clause-real-estate-fake-listing-score" label="fake_listing_score"><inputExpression id="input-expression-real-estate-fake-listing-score" typeRef="number"><text>fake_listing_score</text></inputExpression></input>
+      <input id="input-clause-real-estate-unrealistic-return-score" label="unrealistic_return_score"><inputExpression id="input-expression-real-estate-unrealistic-return-score" typeRef="number"><text>unrealistic_return_score</text></inputExpression></input>
+      <input id="input-clause-real-estate-deposit-risk-score" label="deposit_risk_score"><inputExpression id="input-expression-real-estate-deposit-risk-score" typeRef="number"><text>deposit_risk_score</text></inputExpression></input>
+      <input id="input-clause-real-estate-discrimination-score" label="discrimination_score"><inputExpression id="input-expression-real-estate-discrimination-score" typeRef="number"><text>discrimination_score</text></inputExpression></input>
+      <input id="input-clause-real-estate-scam-score" label="scam_score"><inputExpression id="input-expression-real-estate-scam-score" typeRef="number"><text>scam_score</text></inputExpression></input>
+      <output id="output-real-estate-decision" label="decision"><outputValues id="output-values-real-estate-decision"><text>&quot;REJECT&quot;,&quot;MANUAL_REVIEW&quot;,&quot;WARN_ALLOW&quot;,&quot;ALLOW&quot;</text></outputValues></output>
+      <rule id="rule-real-estate-discrimination-reject"><inputEntry id="real-r1-fake"><text>-</text></inputEntry><inputEntry id="real-r1-unrealistic-return"><text>-</text></inputEntry><inputEntry id="real-r1-deposit"><text>-</text></inputEntry><inputEntry id="real-r1-discrimination"><text>&gt;= 0.75</text></inputEntry><inputEntry id="real-r1-scam"><text>-</text></inputEntry><outputEntry id="real-r1-output"><text>&quot;REJECT&quot;</text></outputEntry></rule>
+      <rule id="rule-real-estate-fake-scam-reject"><inputEntry id="real-r2-fake"><text>&gt;= 0.75</text></inputEntry><inputEntry id="real-r2-unrealistic-return"><text>&gt;= 0.65</text></inputEntry><inputEntry id="real-r2-deposit"><text>-</text></inputEntry><inputEntry id="real-r2-discrimination"><text>-</text></inputEntry><inputEntry id="real-r2-scam"><text>&gt;= 0.60</text></inputEntry><outputEntry id="real-r2-output"><text>&quot;REJECT&quot;</text></outputEntry></rule>
+      <rule id="rule-real-estate-deposit-risk-review"><inputEntry id="real-r3-fake"><text>&gt;= 0.45</text></inputEntry><inputEntry id="real-r3-unrealistic-return"><text>-</text></inputEntry><inputEntry id="real-r3-deposit"><text>&gt;= 0.65</text></inputEntry><inputEntry id="real-r3-discrimination"><text>&lt; 0.75</text></inputEntry><inputEntry id="real-r3-scam"><text>-</text></inputEntry><outputEntry id="real-r3-output"><text>&quot;MANUAL_REVIEW&quot;</text></outputEntry></rule>
+      <rule id="rule-real-estate-unrealistic-return-review"><inputEntry id="real-r4-fake"><text>&lt; 0.75</text></inputEntry><inputEntry id="real-r4-unrealistic-return"><text>&gt;= 0.65</text></inputEntry><inputEntry id="real-r4-deposit"><text>&lt; 0.65</text></inputEntry><inputEntry id="real-r4-discrimination"><text>&lt; 0.75</text></inputEntry><inputEntry id="real-r4-scam"><text>-</text></inputEntry><outputEntry id="real-r4-output"><text>&quot;MANUAL_REVIEW&quot;</text></outputEntry></rule>
+      <rule id="rule-real-estate-low-risk-allow"><inputEntry id="real-r5-fake"><text>&lt; 0.30</text></inputEntry><inputEntry id="real-r5-unrealistic-return"><text>&lt; 0.30</text></inputEntry><inputEntry id="real-r5-deposit"><text>&lt; 0.45</text></inputEntry><inputEntry id="real-r5-discrimination"><text>&lt; 0.45</text></inputEntry><inputEntry id="real-r5-scam"><text>&lt; 0.45</text></inputEntry><outputEntry id="real-r5-output"><text>&quot;ALLOW&quot;</text></outputEntry></rule>
+      <rule id="rule-real-estate-borderline-warning"><inputEntry id="real-r6-fake"><text>[0.30..0.45)</text></inputEntry><inputEntry id="real-r6-unrealistic-return"><text>[0.30..0.65)</text></inputEntry><inputEntry id="real-r6-deposit"><text>&lt; 0.65</text></inputEntry><inputEntry id="real-r6-discrimination"><text>&lt; 0.75</text></inputEntry><inputEntry id="real-r6-scam"><text>&lt; 0.60</text></inputEntry><outputEntry id="real-r6-output"><text>&quot;WARN_ALLOW&quot;</text></outputEntry></rule>
+      <rule id="rule-real-estate-default-review"><inputEntry id="real-r7-fake"><text>-</text></inputEntry><inputEntry id="real-r7-unrealistic-return"><text>-</text></inputEntry><inputEntry id="real-r7-deposit"><text>-</text></inputEntry><inputEntry id="real-r7-discrimination"><text>-</text></inputEntry><inputEntry id="real-r7-scam"><text>-</text></inputEntry><outputEntry id="real-r7-output"><text>&quot;MANUAL_REVIEW&quot;</text></outputEntry></rule>
+    </decisionTable>
+  </decision>
+  <inputData id="input-fake-listing-score" name="fake_listing_score">
+    <variable id="variable-fake-listing-score" name="fake_listing_score" typeRef="number" />
+  </inputData>
+  <inputData id="input-unrealistic-return-score" name="unrealistic_return_score">
+    <variable id="variable-unrealistic-return-score" name="unrealistic_return_score" typeRef="number" />
+  </inputData>
+  <inputData id="input-deposit-risk-score" name="deposit_risk_score">
+    <variable id="variable-deposit-risk-score" name="deposit_risk_score" typeRef="number" />
+  </inputData>
+  <inputData id="input-discrimination-score" name="discrimination_score">
+    <variable id="variable-discrimination-score" name="discrimination_score" typeRef="number" />
+  </inputData>
+  <inputData id="input-scam-score" name="scam_score">
+    <variable id="variable-scam-score" name="scam_score" typeRef="number" />
+  </inputData>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="diagram-real-estate" name="Real Estate Moderation Decision">
+      <dmndi:DMNShape id="shape-fake-listing-score" dmnElementRef="input-fake-listing-score">
+        <dc:Bounds x="80" y="80" width="200" height="70" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape-unrealistic-return-score" dmnElementRef="input-unrealistic-return-score">
+        <dc:Bounds x="80" y="180" width="240" height="70" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape-deposit-risk-score" dmnElementRef="input-deposit-risk-score">
+        <dc:Bounds x="80" y="280" width="200" height="70" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape-discrimination-score" dmnElementRef="input-discrimination-score">
+        <dc:Bounds x="80" y="380" width="210" height="70" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape-scam-score" dmnElementRef="input-scam-score">
+        <dc:Bounds x="80" y="480" width="170" height="70" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape-real-estate-decision" dmnElementRef="decision-real-estate-moderation">
+        <dc:Bounds x="460" y="270" width="260" height="90" />
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="edge-fake-listing-score" dmnElementRef="requirement-fake-listing-score">
+        <di:waypoint x="280" y="115" />
+        <di:waypoint x="460" y="315" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="edge-unrealistic-return-score" dmnElementRef="requirement-unrealistic-return-score">
+        <di:waypoint x="320" y="215" />
+        <di:waypoint x="460" y="315" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="edge-deposit-risk-score" dmnElementRef="requirement-deposit-risk-score">
+        <di:waypoint x="280" y="315" />
+        <di:waypoint x="460" y="315" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="edge-discrimination-score" dmnElementRef="requirement-discrimination-score">
+        <di:waypoint x="290" y="415" />
+        <di:waypoint x="460" y="315" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="edge-scam-score" dmnElementRef="requirement-scam-score">
+        <di:waypoint x="250" y="515" />
+        <di:waypoint x="460" y="315" />
+      </dmndi:DMNEdge>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

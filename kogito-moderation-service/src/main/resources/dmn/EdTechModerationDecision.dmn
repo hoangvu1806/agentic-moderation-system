@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" id="edtech-moderation-definitions" name="EdTechModerationDecision" namespace="https://dentamind.local/dmn/edtech-moderation">
+  <decision id="decision-edtech-moderation" name="EdTechModerationDecision">
+    <variable id="variable-edtech-moderation" name="EdTechModerationDecision" typeRef="string" />
+    <informationRequirement id="requirement-academic-integrity-score">
+      <requiredInput href="#input-academic-integrity-score" />
+    </informationRequirement>
+    <informationRequirement id="requirement-credential-fraud-score">
+      <requiredInput href="#input-credential-fraud-score" />
+    </informationRequirement>
+    <informationRequirement id="requirement-spam-score">
+      <requiredInput href="#input-spam-score" />
+    </informationRequirement>
+    <informationRequirement id="requirement-toxicity-score">
+      <requiredInput href="#input-toxicity-score" />
+    </informationRequirement>
+    <informationRequirement id="requirement-is-repeat-offender">
+      <requiredInput href="#input-is-repeat-offender" />
+    </informationRequirement>
+    <decisionTable id="decision-table-edtech-moderation" hitPolicy="FIRST" preferredOrientation="Rule-as-Row">
+      <input id="input-clause-edtech-academic-integrity-score" label="academic_integrity_score">
+        <inputExpression id="input-expression-edtech-academic-integrity-score" typeRef="number">
+          <text>academic_integrity_score</text>
+        </inputExpression>
+      </input>
+      <input id="input-clause-edtech-credential-fraud-score" label="credential_fraud_score">
+        <inputExpression id="input-expression-edtech-credential-fraud-score" typeRef="number">
+          <text>credential_fraud_score</text>
+        </inputExpression>
+      </input>
+      <input id="input-clause-edtech-spam-score" label="spam_score">
+        <inputExpression id="input-expression-edtech-spam-score" typeRef="number">
+          <text>spam_score</text>
+        </inputExpression>
+      </input>
+      <input id="input-clause-edtech-toxicity-score" label="toxicity_score">
+        <inputExpression id="input-expression-edtech-toxicity-score" typeRef="number">
+          <text>toxicity_score</text>
+        </inputExpression>
+      </input>
+      <input id="input-clause-edtech-is-repeat-offender" label="is_repeat_offender">
+        <inputExpression id="input-expression-edtech-is-repeat-offender" typeRef="boolean">
+          <text>is_repeat_offender</text>
+        </inputExpression>
+      </input>
+      <output id="output-edtech-decision" label="decision">
+        <outputValues id="output-values-edtech-decision">
+          <text>&quot;TEMP_BAN&quot;,&quot;REJECT&quot;,&quot;MANUAL_REVIEW&quot;,&quot;WARN_ALLOW&quot;,&quot;ALLOW&quot;</text>
+        </outputValues>
+      </output>
+      <rule id="rule-edtech-repeat-cheating-temp-ban">
+        <inputEntry id="edtech-r1-academic-integrity"><text>&gt;= 0.70</text></inputEntry>
+        <inputEntry id="edtech-r1-credential-fraud"><text>-</text></inputEntry>
+        <inputEntry id="edtech-r1-spam"><text>-</text></inputEntry>
+        <inputEntry id="edtech-r1-toxicity"><text>-</text></inputEntry>
+        <inputEntry id="edtech-r1-repeat"><text>true</text></inputEntry>
+        <outputEntry id="edtech-r1-output"><text>&quot;TEMP_BAN&quot;</text></outputEntry>
+      </rule>
+      <rule id="rule-edtech-high-academic-integrity-reject">
+        <inputEntry id="edtech-r2-academic-integrity"><text>&gt;= 0.85</text></inputEntry>
+        <inputEntry id="edtech-r2-credential-fraud"><text>-</text></inputEntry>
+        <inputEntry id="edtech-r2-spam"><text>-</text></inputEntry>
+        <inputEntry id="edtech-r2-toxicity"><text>-</text></inputEntry>
+        <inputEntry id="edtech-r2-repeat"><text>-</text></inputEntry>
+        <outputEntry id="edtech-r2-output"><text>&quot;REJECT&quot;</text></outputEntry>
+      </rule>
+      <rule id="rule-edtech-high-credential-fraud-reject">
+        <inputEntry id="edtech-r3-academic-integrity"><text>-</text></inputEntry>
+        <inputEntry id="edtech-r3-credential-fraud"><text>&gt;= 0.80</text></inputEntry>
+        <inputEntry id="edtech-r3-spam"><text>-</text></inputEntry>
+        <inputEntry id="edtech-r3-toxicity"><text>-</text></inputEntry>
+        <inputEntry id="edtech-r3-repeat"><text>-</text></inputEntry>
+        <outputEntry id="edtech-r3-output"><text>&quot;REJECT&quot;</text></outputEntry>
+      </rule>
+      <rule id="rule-edtech-medium-academic-integrity-review">
+        <inputEntry id="edtech-r4-academic-integrity"><text>&gt;= 0.55</text></inputEntry>
+        <inputEntry id="edtech-r4-credential-fraud"><text>-</text></inputEntry>
+        <inputEntry id="edtech-r4-spam"><text>-</text></inputEntry>
+        <inputEntry id="edtech-r4-toxicity"><text>-</text></inputEntry>
+        <inputEntry id="edtech-r4-repeat"><text>-</text></inputEntry>
+        <outputEntry id="edtech-r4-output"><text>&quot;MANUAL_REVIEW&quot;</text></outputEntry>
+      </rule>
+      <rule id="rule-edtech-medium-credential-fraud-review">
+        <inputEntry id="edtech-r5-academic-integrity"><text>-</text></inputEntry>
+        <inputEntry id="edtech-r5-credential-fraud"><text>&gt;= 0.50</text></inputEntry>
+        <inputEntry id="edtech-r5-spam"><text>-</text></inputEntry>
+        <inputEntry id="edtech-r5-toxicity"><text>-</text></inputEntry>
+        <inputEntry id="edtech-r5-repeat"><text>-</text></inputEntry>
+        <outputEntry id="edtech-r5-output"><text>&quot;MANUAL_REVIEW&quot;</text></outputEntry>
+      </rule>
+      <rule id="rule-edtech-course-spam-warning">
+        <inputEntry id="edtech-r6-academic-integrity"><text>&lt; 0.55</text></inputEntry>
+        <inputEntry id="edtech-r6-credential-fraud"><text>&lt; 0.50</text></inputEntry>
+        <inputEntry id="edtech-r6-spam"><text>&gt;= 0.65</text></inputEntry>
+        <inputEntry id="edtech-r6-toxicity"><text>&lt; 0.65</text></inputEntry>
+        <inputEntry id="edtech-r6-repeat"><text>false</text></inputEntry>
+        <outputEntry id="edtech-r6-output"><text>&quot;WARN_ALLOW&quot;</text></outputEntry>
+      </rule>
+      <rule id="rule-edtech-low-risk-allow">
+        <inputEntry id="edtech-r7-academic-integrity"><text>&lt; 0.55</text></inputEntry>
+        <inputEntry id="edtech-r7-credential-fraud"><text>&lt; 0.50</text></inputEntry>
+        <inputEntry id="edtech-r7-spam"><text>&lt; 0.65</text></inputEntry>
+        <inputEntry id="edtech-r7-toxicity"><text>&lt; 0.65</text></inputEntry>
+        <inputEntry id="edtech-r7-repeat"><text>false</text></inputEntry>
+        <outputEntry id="edtech-r7-output"><text>&quot;ALLOW&quot;</text></outputEntry>
+      </rule>
+      <rule id="rule-edtech-default-review">
+        <inputEntry id="edtech-r8-academic-integrity"><text>-</text></inputEntry>
+        <inputEntry id="edtech-r8-credential-fraud"><text>-</text></inputEntry>
+        <inputEntry id="edtech-r8-spam"><text>-</text></inputEntry>
+        <inputEntry id="edtech-r8-toxicity"><text>-</text></inputEntry>
+        <inputEntry id="edtech-r8-repeat"><text>-</text></inputEntry>
+        <outputEntry id="edtech-r8-output"><text>&quot;MANUAL_REVIEW&quot;</text></outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <inputData id="input-academic-integrity-score" name="academic_integrity_score">
+    <variable id="variable-academic-integrity-score" name="academic_integrity_score" typeRef="number" />
+  </inputData>
+  <inputData id="input-credential-fraud-score" name="credential_fraud_score">
+    <variable id="variable-credential-fraud-score" name="credential_fraud_score" typeRef="number" />
+  </inputData>
+  <inputData id="input-spam-score" name="spam_score">
+    <variable id="variable-spam-score" name="spam_score" typeRef="number" />
+  </inputData>
+  <inputData id="input-toxicity-score" name="toxicity_score">
+    <variable id="variable-toxicity-score" name="toxicity_score" typeRef="number" />
+  </inputData>
+  <inputData id="input-is-repeat-offender" name="is_repeat_offender">
+    <variable id="variable-is-repeat-offender" name="is_repeat_offender" typeRef="boolean" />
+  </inputData>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="diagram-edtech" name="EdTech Moderation Decision">
+      <dmndi:DMNShape id="shape-academic-integrity-score" dmnElementRef="input-academic-integrity-score">
+        <dc:Bounds x="80" y="80" width="230" height="70" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape-credential-fraud-score" dmnElementRef="input-credential-fraud-score">
+        <dc:Bounds x="80" y="180" width="230" height="70" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape-spam-score" dmnElementRef="input-spam-score">
+        <dc:Bounds x="80" y="280" width="170" height="70" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape-toxicity-score" dmnElementRef="input-toxicity-score">
+        <dc:Bounds x="80" y="380" width="170" height="70" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape-is-repeat-offender" dmnElementRef="input-is-repeat-offender">
+        <dc:Bounds x="80" y="480" width="200" height="70" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape-edtech-decision" dmnElementRef="decision-edtech-moderation">
+        <dc:Bounds x="460" y="270" width="240" height="90" />
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="edge-academic-integrity-score" dmnElementRef="requirement-academic-integrity-score">
+        <di:waypoint x="310" y="115" />
+        <di:waypoint x="460" y="315" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="edge-credential-fraud-score" dmnElementRef="requirement-credential-fraud-score">
+        <di:waypoint x="310" y="215" />
+        <di:waypoint x="460" y="315" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="edge-spam-score" dmnElementRef="requirement-spam-score">
+        <di:waypoint x="250" y="315" />
+        <di:waypoint x="460" y="315" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="edge-toxicity-score" dmnElementRef="requirement-toxicity-score">
+        <di:waypoint x="250" y="415" />
+        <di:waypoint x="460" y="315" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="edge-is-repeat-offender" dmnElementRef="requirement-is-repeat-offender">
+        <di:waypoint x="280" y="515" />
+        <di:waypoint x="460" y="315" />
+      </dmndi:DMNEdge>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

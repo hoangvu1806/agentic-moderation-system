@@ -1,0 +1,706 @@
+---
+openapi: 3.0.3
+info:
+  title: kogito-moderation-service API
+  version: 0.1.0-SNAPSHOT
+tags:
+- name: pre_publication_moderation_process
+paths:
+  /DomainClassificationDecision:
+    get:
+      tags:
+      - Domain Classification Decision Resource
+      responses:
+        "200":
+          description: OK
+          content:
+            application/xml:
+              schema:
+                type: string
+    post:
+      tags:
+      - Domain Classification Decision Resource
+      requestBody:
+        description: DMN input
+        content:
+          application/json:
+            schema:
+              $ref: /DomainClassificationDecision.json#/definitions/InputSet
+      responses:
+        default:
+          description: DMN output
+          content:
+            application/json:
+              schema:
+                $ref: /DomainClassificationDecision.json#/definitions/OutputSet
+  /DomainClassificationDecision/dmnresult:
+    post:
+      tags:
+      - Domain Classification Decision Resource
+      requestBody:
+        description: DMN input
+        content:
+          application/json:
+            schema:
+              $ref: /DomainClassificationDecision.json#/definitions/InputSet
+      responses:
+        "200":
+          description: OK
+  /EcommerceModerationDecision:
+    get:
+      tags:
+      - Ecommerce Moderation Decision Resource
+      responses:
+        "200":
+          description: OK
+          content:
+            application/xml:
+              schema:
+                type: string
+    post:
+      tags:
+      - Ecommerce Moderation Decision Resource
+      requestBody:
+        description: DMN input
+        content:
+          application/json:
+            schema:
+              $ref: /EcommerceModerationDecision.json#/definitions/InputSet
+      responses:
+        default:
+          description: DMN output
+          content:
+            application/json:
+              schema:
+                $ref: /EcommerceModerationDecision.json#/definitions/OutputSet
+  /EcommerceModerationDecision/dmnresult:
+    post:
+      tags:
+      - Ecommerce Moderation Decision Resource
+      requestBody:
+        description: DMN input
+        content:
+          application/json:
+            schema:
+              $ref: /EcommerceModerationDecision.json#/definitions/InputSet
+      responses:
+        "200":
+          description: OK
+  /EdTechModerationDecision:
+    get:
+      tags:
+      - Ed Tech Moderation Decision Resource
+      responses:
+        "200":
+          description: OK
+          content:
+            application/xml:
+              schema:
+                type: string
+    post:
+      tags:
+      - Ed Tech Moderation Decision Resource
+      requestBody:
+        description: DMN input
+        content:
+          application/json:
+            schema:
+              $ref: /EdTechModerationDecision.json#/definitions/InputSet
+      responses:
+        default:
+          description: DMN output
+          content:
+            application/json:
+              schema:
+                $ref: /EdTechModerationDecision.json#/definitions/OutputSet
+  /EdTechModerationDecision/dmnresult:
+    post:
+      tags:
+      - Ed Tech Moderation Decision Resource
+      requestBody:
+        description: DMN input
+        content:
+          application/json:
+            schema:
+              $ref: /EdTechModerationDecision.json#/definitions/InputSet
+      responses:
+        "200":
+          description: OK
+  /EnterpriseHrModerationDecision:
+    get:
+      tags:
+      - Enterprise Hr Moderation Decision Resource
+      responses:
+        "200":
+          description: OK
+          content:
+            application/xml:
+              schema:
+                type: string
+    post:
+      tags:
+      - Enterprise Hr Moderation Decision Resource
+      requestBody:
+        description: DMN input
+        content:
+          application/json:
+            schema:
+              $ref: /EnterpriseHrModerationDecision.json#/definitions/InputSet
+      responses:
+        default:
+          description: DMN output
+          content:
+            application/json:
+              schema:
+                $ref: /EnterpriseHrModerationDecision.json#/definitions/OutputSet
+  /EnterpriseHrModerationDecision/dmnresult:
+    post:
+      tags:
+      - Enterprise Hr Moderation Decision Resource
+      requestBody:
+        description: DMN input
+        content:
+          application/json:
+            schema:
+              $ref: /EnterpriseHrModerationDecision.json#/definitions/InputSet
+      responses:
+        "200":
+          description: OK
+  /HealthcareModerationDecision:
+    get:
+      tags:
+      - Healthcare Moderation Decision Resource
+      responses:
+        "200":
+          description: OK
+          content:
+            application/xml:
+              schema:
+                type: string
+    post:
+      tags:
+      - Healthcare Moderation Decision Resource
+      requestBody:
+        description: DMN input
+        content:
+          application/json:
+            schema:
+              $ref: /HealthcareModerationDecision.json#/definitions/InputSet
+      responses:
+        default:
+          description: DMN output
+          content:
+            application/json:
+              schema:
+                $ref: /HealthcareModerationDecision.json#/definitions/OutputSet
+  /HealthcareModerationDecision/dmnresult:
+    post:
+      tags:
+      - Healthcare Moderation Decision Resource
+      requestBody:
+        description: DMN input
+        content:
+          application/json:
+            schema:
+              $ref: /HealthcareModerationDecision.json#/definitions/InputSet
+      responses:
+        "200":
+          description: OK
+  /RealEstateModerationDecision:
+    get:
+      tags:
+      - Real Estate Moderation Decision Resource
+      responses:
+        "200":
+          description: OK
+          content:
+            application/xml:
+              schema:
+                type: string
+    post:
+      tags:
+      - Real Estate Moderation Decision Resource
+      requestBody:
+        description: DMN input
+        content:
+          application/json:
+            schema:
+              $ref: /RealEstateModerationDecision.json#/definitions/InputSet
+      responses:
+        default:
+          description: DMN output
+          content:
+            application/json:
+              schema:
+                $ref: /RealEstateModerationDecision.json#/definitions/OutputSet
+  /RealEstateModerationDecision/dmnresult:
+    post:
+      tags:
+      - Real Estate Moderation Decision Resource
+      requestBody:
+        description: DMN input
+        content:
+          application/json:
+            schema:
+              $ref: /RealEstateModerationDecision.json#/definitions/InputSet
+      responses:
+        "200":
+          description: OK
+  /management/processes:
+    get:
+      tags:
+      - Process Instance Management Resource
+      responses:
+        "200":
+          description: OK
+  /management/processes/{processId}:
+    get:
+      tags:
+      - Process Instance Management Resource
+      parameters:
+      - name: processId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+  /management/processes/{processId}/instances/{processInstanceId}:
+    delete:
+      tags:
+      - Process Instance Management Resource
+      parameters:
+      - name: processId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: processInstanceId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+  /management/processes/{processId}/instances/{processInstanceId}/error:
+    get:
+      tags:
+      - Process Instance Management Resource
+      parameters:
+      - name: processId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: processInstanceId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+  /management/processes/{processId}/instances/{processInstanceId}/migrate:
+    post:
+      tags:
+      - Process Instance Management Resource
+      parameters:
+      - name: processId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: processInstanceId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProcessMigrationSpec"
+      responses:
+        "200":
+          description: OK
+  /management/processes/{processId}/instances/{processInstanceId}/nodeInstances:
+    get:
+      tags:
+      - Process Instance Management Resource
+      parameters:
+      - name: processId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: processInstanceId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+  /management/processes/{processId}/instances/{processInstanceId}/nodeInstances/{nodeInstanceId}:
+    post:
+      tags:
+      - Process Instance Management Resource
+      parameters:
+      - name: nodeInstanceId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: processId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: processInstanceId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+    delete:
+      tags:
+      - Process Instance Management Resource
+      parameters:
+      - name: nodeInstanceId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: processId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: processInstanceId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+  /management/processes/{processId}/instances/{processInstanceId}/nodes/{nodeId}:
+    post:
+      tags:
+      - Process Instance Management Resource
+      parameters:
+      - name: nodeId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: processId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: processInstanceId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+  /management/processes/{processId}/instances/{processInstanceId}/retrigger:
+    post:
+      tags:
+      - Process Instance Management Resource
+      parameters:
+      - name: processId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: processInstanceId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+  /management/processes/{processId}/instances/{processInstanceId}/skip:
+    post:
+      tags:
+      - Process Instance Management Resource
+      parameters:
+      - name: processId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: processInstanceId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+  /management/processes/{processId}/migrate:
+    post:
+      tags:
+      - Process Instance Management Resource
+      parameters:
+      - name: processId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProcessMigrationSpec"
+      responses:
+        "200":
+          description: OK
+  /management/processes/{processId}/nodes:
+    get:
+      tags:
+      - Process Instance Management Resource
+      parameters:
+      - name: processId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+  /pre_publication_moderation_process:
+    get:
+      tags:
+      - pre_publication_moderation_process
+      summary: pre_publication_moderation_process
+      description: ""
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Pre_publication_moderation_processModelOutput"
+    post:
+      tags:
+      - pre_publication_moderation_process
+      summary: pre_publication_moderation_process
+      description: ""
+      parameters:
+      - name: businessKey
+        in: query
+        schema:
+          default: ""
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Pre_publication_moderation_processModelInput"
+      responses:
+        "200":
+          description: OK
+  /pre_publication_moderation_process/schema:
+    get:
+      tags:
+      - pre_publication_moderation_process
+      summary: pre_publication_moderation_process
+      description: ""
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+  /pre_publication_moderation_process/{id}:
+    get:
+      tags:
+      - pre_publication_moderation_process
+      summary: pre_publication_moderation_process
+      description: ""
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pre_publication_moderation_processModelOutput"
+    put:
+      tags:
+      - pre_publication_moderation_process
+      summary: pre_publication_moderation_process
+      description: ""
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Pre_publication_moderation_processModelInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pre_publication_moderation_processModelOutput"
+    delete:
+      tags:
+      - pre_publication_moderation_process
+      summary: pre_publication_moderation_process
+      description: ""
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pre_publication_moderation_processModelOutput"
+    patch:
+      tags:
+      - pre_publication_moderation_process
+      summary: pre_publication_moderation_process
+      description: ""
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Pre_publication_moderation_processModelInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pre_publication_moderation_processModelOutput"
+  /pre_publication_moderation_process/{id}/tasks:
+    get:
+      tags:
+      - pre_publication_moderation_process
+      summary: pre_publication_moderation_process
+      description: ""
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: group
+        in: query
+        schema:
+          type: array
+          items:
+            type: string
+      - name: user
+        in: query
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TaskModel"
+components:
+  schemas:
+    Pre_publication_moderation_processModelInput:
+      type: object
+      properties:
+        content_id:
+          type: string
+        requires_domain_review:
+          type: boolean
+        dmn_decision:
+          type: string
+        moderation_status:
+          type: string
+        domain_confidence:
+          format: double
+          type: number
+        domain_dmn:
+          type: string
+        detected_domain:
+          type: string
+    Pre_publication_moderation_processModelOutput:
+      type: object
+      properties:
+        id:
+          type: string
+        content_id:
+          type: string
+        requires_domain_review:
+          type: boolean
+        dmn_decision:
+          type: string
+        moderation_status:
+          type: string
+        domain_confidence:
+          format: double
+          type: number
+        domain_dmn:
+          type: string
+        detected_domain:
+          type: string
+    ProcessMigrationSpec:
+      type: object
+      properties:
+        targetProcessId:
+          type: string
+        targetProcessVersion:
+          type: string
+    TaskModel:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        state:
+          format: int32
+          type: integer
+        phase:
+          type: string
+        phaseStatus:
+          type: string
+        parameters: {}
+        results: {}
+

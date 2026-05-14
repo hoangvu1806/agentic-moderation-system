@@ -1,0 +1,486 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" xmlns:kie="https://kie.org/dmn/extensions/1.0" id="domain-classification-definitions" name="DomainClassificationDecision" namespace="https://dentamind.local/dmn/domain-classification">
+  <itemDefinition id="item-domain-classification-result" name="DomainClassificationResult">
+    <itemComponent id="item-detected-domain" name="detected_domain">
+      <typeRef>string</typeRef>
+    </itemComponent>
+    <itemComponent id="item-domain-confidence" name="domain_confidence">
+      <typeRef>number</typeRef>
+    </itemComponent>
+    <itemComponent id="item-analysis-profile" name="analysis_profile">
+      <typeRef>string</typeRef>
+    </itemComponent>
+    <itemComponent id="item-content-prompt-profile" name="content_prompt_profile">
+      <typeRef>string</typeRef>
+    </itemComponent>
+    <itemComponent id="item-image-prompt-profile" name="image_prompt_profile">
+      <typeRef>string</typeRef>
+    </itemComponent>
+    <itemComponent id="item-requires-domain-review" name="requires_domain_review">
+      <typeRef>boolean</typeRef>
+    </itemComponent>
+  </itemDefinition>
+  <decision id="decision-domain-classification" name="DomainClassificationDecision">
+    <variable id="variable-domain-classification" name="DomainClassificationDecision" typeRef="DomainClassificationResult" />
+    <informationRequirement id="requirement-llm-domain-hint">
+      <requiredInput href="#input-llm-domain-hint" />
+    </informationRequirement>
+    <informationRequirement id="requirement-llm-domain-confidence-hint">
+      <requiredInput href="#input-llm-domain-confidence-hint" />
+    </informationRequirement>
+    <informationRequirement id="requirement-declared-category">
+      <requiredInput href="#input-declared-category" />
+    </informationRequirement>
+    <informationRequirement id="requirement-source-channel">
+      <requiredInput href="#input-source-channel" />
+    </informationRequirement>
+    <informationRequirement id="requirement-has-image">
+      <requiredInput href="#input-has-image" />
+    </informationRequirement>
+    <decisionTable id="decision-table-domain-classification" hitPolicy="FIRST" preferredOrientation="Rule-as-Row">
+      <input id="input-clause-llm-domain-hint" label="llm_domain_hint">
+        <inputExpression id="input-expression-llm-domain-hint" typeRef="string">
+          <text>llm_domain_hint</text>
+        </inputExpression>
+      </input>
+      <input id="input-clause-llm-domain-confidence-hint" label="llm_domain_confidence_hint">
+        <inputExpression id="input-expression-llm-domain-confidence-hint" typeRef="number">
+          <text>llm_domain_confidence_hint</text>
+        </inputExpression>
+      </input>
+      <input id="input-clause-declared-category" label="declared_category">
+        <inputExpression id="input-expression-declared-category" typeRef="string">
+          <text>declared_category</text>
+        </inputExpression>
+      </input>
+      <input id="input-clause-source-channel" label="source_channel">
+        <inputExpression id="input-expression-source-channel" typeRef="string">
+          <text>source_channel</text>
+        </inputExpression>
+      </input>
+      <output id="output-detected-domain" label="detected_domain" name="detected_domain" typeRef="string" />
+      <output id="output-domain-confidence" label="domain_confidence" name="domain_confidence" typeRef="number" />
+      <output id="output-analysis-profile" label="analysis_profile" name="analysis_profile" typeRef="string" />
+      <output id="output-content-prompt-profile" label="content_prompt_profile" name="content_prompt_profile" typeRef="string" />
+      <output id="output-image-prompt-profile" label="image_prompt_profile" name="image_prompt_profile" typeRef="string" />
+      <output id="output-requires-domain-review" label="requires_domain_review" name="requires_domain_review" typeRef="boolean" />
+      <rule id="rule-edtech-high">
+        <inputEntry id="domain-r1-domain-hint">
+          <text>&quot;EDTECH&quot;</text>
+        </inputEntry>
+        <inputEntry id="domain-r1-confidence-input">
+          <text>&gt;= 0.70</text>
+        </inputEntry>
+        <inputEntry id="domain-r1-category">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="domain-r1-source-channel">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="domain-r1-domain">
+          <text>&quot;EDTECH&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r1-confidence">
+          <text>0.95</text>
+        </outputEntry>
+        <outputEntry id="domain-r1-analysis">
+          <text>&quot;EDTECH_ELEARNING&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r1-content-profile">
+          <text>&quot;edtech_text_moderation_v1&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r1-image-profile">
+          <text>&quot;edtech_image_moderation_v1&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r1-review">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule-ecommerce-high">
+        <inputEntry id="domain-r2-domain-hint">
+          <text>&quot;ECOMMERCE&quot;</text>
+        </inputEntry>
+        <inputEntry id="domain-r2-confidence-input">
+          <text>&gt;= 0.70</text>
+        </inputEntry>
+        <inputEntry id="domain-r2-category">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="domain-r2-source-channel">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="domain-r2-domain">
+          <text>&quot;ECOMMERCE&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r2-confidence">
+          <text>0.95</text>
+        </outputEntry>
+        <outputEntry id="domain-r2-analysis">
+          <text>&quot;ECOMMERCE_MARKETPLACE&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r2-content-profile">
+          <text>&quot;ecommerce_text_moderation_v1&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r2-image-profile">
+          <text>&quot;ecommerce_image_moderation_v1&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r2-review">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule-real-estate-high">
+        <inputEntry id="domain-r3-domain-hint">
+          <text>&quot;REAL_ESTATE&quot;</text>
+        </inputEntry>
+        <inputEntry id="domain-r3-confidence-input">
+          <text>&gt;= 0.70</text>
+        </inputEntry>
+        <inputEntry id="domain-r3-category">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="domain-r3-source-channel">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="domain-r3-domain">
+          <text>&quot;REAL_ESTATE&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r3-confidence">
+          <text>0.95</text>
+        </outputEntry>
+        <outputEntry id="domain-r3-analysis">
+          <text>&quot;REAL_ESTATE_LISTING&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r3-content-profile">
+          <text>&quot;real_estate_text_moderation_v1&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r3-image-profile">
+          <text>&quot;real_estate_image_moderation_v1&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r3-review">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule-healthcare-high">
+        <inputEntry id="domain-r4-domain-hint">
+          <text>&quot;HEALTHCARE&quot;</text>
+        </inputEntry>
+        <inputEntry id="domain-r4-confidence-input">
+          <text>&gt;= 0.70</text>
+        </inputEntry>
+        <inputEntry id="domain-r4-category">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="domain-r4-source-channel">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="domain-r4-domain">
+          <text>&quot;HEALTHCARE&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r4-confidence">
+          <text>0.95</text>
+        </outputEntry>
+        <outputEntry id="domain-r4-analysis">
+          <text>&quot;HEALTHCARE_TELEMEDICINE&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r4-content-profile">
+          <text>&quot;healthcare_text_moderation_v1&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r4-image-profile">
+          <text>&quot;healthcare_image_moderation_v1&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r4-review">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule-enterprise-hr-high">
+        <inputEntry id="domain-r5-domain-hint">
+          <text>&quot;ENTERPRISE_HR&quot;</text>
+        </inputEntry>
+        <inputEntry id="domain-r5-confidence-input">
+          <text>&gt;= 0.70</text>
+        </inputEntry>
+        <inputEntry id="domain-r5-category">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="domain-r5-source-channel">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="domain-r5-domain">
+          <text>&quot;ENTERPRISE_HR&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r5-confidence">
+          <text>0.95</text>
+        </outputEntry>
+        <outputEntry id="domain-r5-analysis">
+          <text>&quot;ENTERPRISE_HR_INTERNAL_COMMUNICATION&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r5-content-profile">
+          <text>&quot;enterprise_hr_text_moderation_v1&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r5-image-profile">
+          <text>&quot;enterprise_hr_image_moderation_v1&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r5-review">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule-edtech-category">
+        <inputEntry id="domain-r6-domain-hint">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="domain-r6-confidence-input">
+          <text>&lt; 0.70</text>
+        </inputEntry>
+        <inputEntry id="domain-r6-category">
+          <text>&quot;education&quot;, &quot;course&quot;, &quot;learning&quot;, &quot;exam&quot;</text>
+        </inputEntry>
+        <inputEntry id="domain-r6-source-channel">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="domain-r6-domain">
+          <text>&quot;EDTECH&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r6-confidence">
+          <text>0.75</text>
+        </outputEntry>
+        <outputEntry id="domain-r6-analysis">
+          <text>&quot;EDTECH_ELEARNING&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r6-content-profile">
+          <text>&quot;edtech_text_moderation_v1&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r6-image-profile">
+          <text>&quot;edtech_image_moderation_v1&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r6-review">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule-ecommerce-category">
+        <inputEntry id="domain-r7-domain-hint">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="domain-r7-confidence-input">
+          <text>&lt; 0.70</text>
+        </inputEntry>
+        <inputEntry id="domain-r7-category">
+          <text>&quot;marketplace&quot;, &quot;product&quot;, &quot;shopping&quot;</text>
+        </inputEntry>
+        <inputEntry id="domain-r7-source-channel">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="domain-r7-domain">
+          <text>&quot;ECOMMERCE&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r7-confidence">
+          <text>0.75</text>
+        </outputEntry>
+        <outputEntry id="domain-r7-analysis">
+          <text>&quot;ECOMMERCE_MARKETPLACE&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r7-content-profile">
+          <text>&quot;ecommerce_text_moderation_v1&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r7-image-profile">
+          <text>&quot;ecommerce_image_moderation_v1&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r7-review">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule-real-estate-category">
+        <inputEntry id="domain-r8-domain-hint">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="domain-r8-confidence-input">
+          <text>&lt; 0.70</text>
+        </inputEntry>
+        <inputEntry id="domain-r8-category">
+          <text>&quot;real_estate&quot;, &quot;property&quot;, &quot;listing&quot;, &quot;housing&quot;</text>
+        </inputEntry>
+        <inputEntry id="domain-r8-source-channel">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="domain-r8-domain">
+          <text>&quot;REAL_ESTATE&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r8-confidence">
+          <text>0.75</text>
+        </outputEntry>
+        <outputEntry id="domain-r8-analysis">
+          <text>&quot;REAL_ESTATE_LISTING&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r8-content-profile">
+          <text>&quot;real_estate_text_moderation_v1&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r8-image-profile">
+          <text>&quot;real_estate_image_moderation_v1&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r8-review">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule-healthcare-category">
+        <inputEntry id="domain-r9-domain-hint">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="domain-r9-confidence-input">
+          <text>&lt; 0.70</text>
+        </inputEntry>
+        <inputEntry id="domain-r9-category">
+          <text>&quot;healthcare&quot;, &quot;medical&quot;, &quot;telemedicine&quot;, &quot;wellness&quot;</text>
+        </inputEntry>
+        <inputEntry id="domain-r9-source-channel">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="domain-r9-domain">
+          <text>&quot;HEALTHCARE&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r9-confidence">
+          <text>0.75</text>
+        </outputEntry>
+        <outputEntry id="domain-r9-analysis">
+          <text>&quot;HEALTHCARE_TELEMEDICINE&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r9-content-profile">
+          <text>&quot;healthcare_text_moderation_v1&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r9-image-profile">
+          <text>&quot;healthcare_image_moderation_v1&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r9-review">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule-enterprise-hr-channel">
+        <inputEntry id="domain-r10-domain-hint">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="domain-r10-confidence-input">
+          <text>&lt; 0.70</text>
+        </inputEntry>
+        <inputEntry id="domain-r10-category">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="domain-r10-source-channel">
+          <text>&quot;internal_feed&quot;, &quot;hr_portal&quot;, &quot;company_forum&quot;, &quot;employee_feed&quot;</text>
+        </inputEntry>
+        <outputEntry id="domain-r10-domain">
+          <text>&quot;ENTERPRISE_HR&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r10-confidence">
+          <text>0.75</text>
+        </outputEntry>
+        <outputEntry id="domain-r10-analysis">
+          <text>&quot;ENTERPRISE_HR_INTERNAL_COMMUNICATION&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r10-content-profile">
+          <text>&quot;enterprise_hr_text_moderation_v1&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r10-image-profile">
+          <text>&quot;enterprise_hr_image_moderation_v1&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r10-review">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule-domain-unknown">
+        <inputEntry id="domain-r11-domain-hint">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="domain-r11-confidence-input">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="domain-r11-category">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="domain-r11-source-channel">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="domain-r11-domain">
+          <text>&quot;UNKNOWN&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r11-confidence">
+          <text>0.30</text>
+        </outputEntry>
+        <outputEntry id="domain-r11-analysis">
+          <text>&quot;GENERIC_REVIEW&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r11-content-profile">
+          <text>&quot;generic_text_moderation_v1&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r11-image-profile">
+          <text>&quot;generic_image_moderation_v1&quot;</text>
+        </outputEntry>
+        <outputEntry id="domain-r11-review">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <inputData id="input-llm-domain-hint" name="llm_domain_hint">
+    <variable id="variable-llm-domain-hint" name="llm_domain_hint" typeRef="string" />
+  </inputData>
+  <inputData id="input-llm-domain-confidence-hint" name="llm_domain_confidence_hint">
+    <variable id="variable-llm-domain-confidence-hint" name="llm_domain_confidence_hint" typeRef="number" />
+  </inputData>
+  <inputData id="input-declared-category" name="declared_category">
+    <variable id="variable-declared-category" name="declared_category" typeRef="string" />
+  </inputData>
+  <inputData id="input-source-channel" name="source_channel">
+    <variable id="variable-source-channel" name="source_channel" typeRef="string" />
+  </inputData>
+  <inputData id="input-has-image" name="has_image">
+    <variable id="variable-has-image" name="has_image" typeRef="boolean" />
+  </inputData>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="diagram-domain-classification" name="Domain Classification Decision">
+      <di:extension>
+        <kie:ComponentsWidthsExtension>
+          <kie:ComponentWidths dmnElementRef="decision-table-domain-classification">
+            <kie:width>100</kie:width>
+            <kie:width>557</kie:width>
+          </kie:ComponentWidths>
+        </kie:ComponentsWidthsExtension>
+      </di:extension>
+      <dmndi:DMNShape id="shape-llm-domain-hint" dmnElementRef="input-llm-domain-hint">
+        <dc:Bounds x="80" y="60" width="190" height="70" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape-llm-domain-confidence-hint" dmnElementRef="input-llm-domain-confidence-hint">
+        <dc:Bounds x="80" y="150" width="240" height="70" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape-declared-category" dmnElementRef="input-declared-category">
+        <dc:Bounds x="80" y="240" width="190" height="70" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape-source-channel" dmnElementRef="input-source-channel">
+        <dc:Bounds x="80" y="330" width="190" height="70" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape-has-image" dmnElementRef="input-has-image">
+        <dc:Bounds x="80" y="420" width="190" height="70" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape-domain-classification" dmnElementRef="decision-domain-classification">
+        <dc:Bounds x="470" y="250" width="260" height="100" />
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="edge-llm-domain-hint" dmnElementRef="requirement-llm-domain-hint">
+        <di:waypoint x="270" y="95" />
+        <di:waypoint x="470" y="300" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="edge-llm-domain-confidence-hint" dmnElementRef="requirement-llm-domain-confidence-hint">
+        <di:waypoint x="320" y="185" />
+        <di:waypoint x="470" y="300" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="edge-declared-category" dmnElementRef="requirement-declared-category">
+        <di:waypoint x="270" y="275" />
+        <di:waypoint x="470" y="300" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="edge-source-channel" dmnElementRef="requirement-source-channel">
+        <di:waypoint x="270" y="365" />
+        <di:waypoint x="470" y="300" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="edge-has-image" dmnElementRef="requirement-has-image">
+        <di:waypoint x="270" y="455" />
+        <di:waypoint x="470" y="300" />
+      </dmndi:DMNEdge>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

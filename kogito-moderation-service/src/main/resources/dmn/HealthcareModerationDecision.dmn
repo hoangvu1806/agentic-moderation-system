@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" id="healthcare-moderation-definitions" name="HealthcareModerationDecision" namespace="https://dentamind.local/dmn/healthcare-moderation">
+  <decision id="decision-healthcare-moderation" name="HealthcareModerationDecision">
+    <variable id="variable-healthcare-moderation" name="HealthcareModerationDecision" typeRef="string" />
+    <informationRequirement id="requirement-unsafe-medical-advice-score">
+      <requiredInput href="#input-unsafe-medical-advice-score" />
+    </informationRequirement>
+    <informationRequirement id="requirement-emergency-risk-score">
+      <requiredInput href="#input-emergency-risk-score" />
+    </informationRequirement>
+    <informationRequirement id="requirement-medical-claim-score">
+      <requiredInput href="#input-medical-claim-score" />
+    </informationRequirement>
+    <informationRequirement id="requirement-scam-score">
+      <requiredInput href="#input-scam-score" />
+    </informationRequirement>
+    <informationRequirement id="requirement-toxicity-score">
+      <requiredInput href="#input-toxicity-score" />
+    </informationRequirement>
+    <decisionTable id="decision-table-healthcare-moderation" hitPolicy="FIRST" preferredOrientation="Rule-as-Row">
+      <input id="input-clause-healthcare-unsafe-medical-advice-score" label="unsafe_medical_advice_score"><inputExpression id="input-expression-healthcare-unsafe-medical-advice-score" typeRef="number"><text>unsafe_medical_advice_score</text></inputExpression></input>
+      <input id="input-clause-healthcare-emergency-risk-score" label="emergency_risk_score"><inputExpression id="input-expression-healthcare-emergency-risk-score" typeRef="number"><text>emergency_risk_score</text></inputExpression></input>
+      <input id="input-clause-healthcare-medical-claim-score" label="medical_claim_score"><inputExpression id="input-expression-healthcare-medical-claim-score" typeRef="number"><text>medical_claim_score</text></inputExpression></input>
+      <input id="input-clause-healthcare-scam-score" label="scam_score"><inputExpression id="input-expression-healthcare-scam-score" typeRef="number"><text>scam_score</text></inputExpression></input>
+      <input id="input-clause-healthcare-toxicity-score" label="toxicity_score"><inputExpression id="input-expression-healthcare-toxicity-score" typeRef="number"><text>toxicity_score</text></inputExpression></input>
+      <output id="output-healthcare-decision" label="decision"><outputValues id="output-values-healthcare-decision"><text>&quot;REJECT&quot;,&quot;MANUAL_REVIEW&quot;,&quot;WARN_ALLOW&quot;,&quot;ALLOW&quot;</text></outputValues></output>
+      <rule id="rule-healthcare-unsafe-advice-reject"><inputEntry id="health-r1-unsafe"><text>&gt;= 0.80</text></inputEntry><inputEntry id="health-r1-emergency"><text>-</text></inputEntry><inputEntry id="health-r1-medical-claim"><text>-</text></inputEntry><inputEntry id="health-r1-scam"><text>-</text></inputEntry><inputEntry id="health-r1-toxicity"><text>-</text></inputEntry><outputEntry id="health-r1-output"><text>&quot;REJECT&quot;</text></outputEntry></rule>
+      <rule id="rule-healthcare-medical-scam-reject"><inputEntry id="health-r2-unsafe"><text>-</text></inputEntry><inputEntry id="health-r2-emergency"><text>-</text></inputEntry><inputEntry id="health-r2-medical-claim"><text>&gt;= 0.75</text></inputEntry><inputEntry id="health-r2-scam"><text>&gt;= 0.60</text></inputEntry><inputEntry id="health-r2-toxicity"><text>-</text></inputEntry><outputEntry id="health-r2-output"><text>&quot;REJECT&quot;</text></outputEntry></rule>
+      <rule id="rule-healthcare-emergency-review"><inputEntry id="health-r3-unsafe"><text>-</text></inputEntry><inputEntry id="health-r3-emergency"><text>&gt;= 0.70</text></inputEntry><inputEntry id="health-r3-medical-claim"><text>-</text></inputEntry><inputEntry id="health-r3-scam"><text>-</text></inputEntry><inputEntry id="health-r3-toxicity"><text>-</text></inputEntry><outputEntry id="health-r3-output"><text>&quot;MANUAL_REVIEW&quot;</text></outputEntry></rule>
+      <rule id="rule-healthcare-medical-claim-review"><inputEntry id="health-r4-unsafe"><text>-</text></inputEntry><inputEntry id="health-r4-emergency"><text>-</text></inputEntry><inputEntry id="health-r4-medical-claim"><text>&gt;= 0.60</text></inputEntry><inputEntry id="health-r4-scam"><text>-</text></inputEntry><inputEntry id="health-r4-toxicity"><text>-</text></inputEntry><outputEntry id="health-r4-output"><text>&quot;MANUAL_REVIEW&quot;</text></outputEntry></rule>
+      <rule id="rule-healthcare-low-risk-allow"><inputEntry id="health-r5-unsafe"><text>&lt; 0.40</text></inputEntry><inputEntry id="health-r5-emergency"><text>&lt; 0.40</text></inputEntry><inputEntry id="health-r5-medical-claim"><text>&lt; 0.40</text></inputEntry><inputEntry id="health-r5-scam"><text>&lt; 0.40</text></inputEntry><inputEntry id="health-r5-toxicity"><text>&lt; 0.50</text></inputEntry><outputEntry id="health-r5-output"><text>&quot;ALLOW&quot;</text></outputEntry></rule>
+      <rule id="rule-healthcare-borderline-warning"><inputEntry id="health-r6-unsafe"><text>&gt;= 0.40</text></inputEntry><inputEntry id="health-r6-emergency"><text>&lt; 0.70</text></inputEntry><inputEntry id="health-r6-medical-claim"><text>&lt; 0.60</text></inputEntry><inputEntry id="health-r6-scam"><text>&lt; 0.60</text></inputEntry><inputEntry id="health-r6-toxicity"><text>&lt; 0.70</text></inputEntry><outputEntry id="health-r6-output"><text>&quot;WARN_ALLOW&quot;</text></outputEntry></rule>
+      <rule id="rule-healthcare-default-review"><inputEntry id="health-r7-unsafe"><text>-</text></inputEntry><inputEntry id="health-r7-emergency"><text>-</text></inputEntry><inputEntry id="health-r7-medical-claim"><text>-</text></inputEntry><inputEntry id="health-r7-scam"><text>-</text></inputEntry><inputEntry id="health-r7-toxicity"><text>-</text></inputEntry><outputEntry id="health-r7-output"><text>&quot;MANUAL_REVIEW&quot;</text></outputEntry></rule>
+    </decisionTable>
+  </decision>
+  <inputData id="input-unsafe-medical-advice-score" name="unsafe_medical_advice_score">
+    <variable id="variable-unsafe-medical-advice-score" name="unsafe_medical_advice_score" typeRef="number" />
+  </inputData>
+  <inputData id="input-emergency-risk-score" name="emergency_risk_score">
+    <variable id="variable-emergency-risk-score" name="emergency_risk_score" typeRef="number" />
+  </inputData>
+  <inputData id="input-medical-claim-score" name="medical_claim_score">
+    <variable id="variable-medical-claim-score" name="medical_claim_score" typeRef="number" />
+  </inputData>
+  <inputData id="input-scam-score" name="scam_score">
+    <variable id="variable-scam-score" name="scam_score" typeRef="number" />
+  </inputData>
+  <inputData id="input-toxicity-score" name="toxicity_score">
+    <variable id="variable-toxicity-score" name="toxicity_score" typeRef="number" />
+  </inputData>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="diagram-healthcare" name="Healthcare Moderation Decision">
+      <dmndi:DMNShape id="shape-unsafe-medical-advice-score" dmnElementRef="input-unsafe-medical-advice-score">
+        <dc:Bounds x="80" y="80" width="260" height="70" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape-emergency-risk-score" dmnElementRef="input-emergency-risk-score">
+        <dc:Bounds x="80" y="180" width="220" height="70" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape-medical-claim-score" dmnElementRef="input-medical-claim-score">
+        <dc:Bounds x="80" y="280" width="220" height="70" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape-scam-score" dmnElementRef="input-scam-score">
+        <dc:Bounds x="80" y="380" width="170" height="70" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape-toxicity-score" dmnElementRef="input-toxicity-score">
+        <dc:Bounds x="80" y="480" width="170" height="70" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape-healthcare-decision" dmnElementRef="decision-healthcare-moderation">
+        <dc:Bounds x="470" y="270" width="250" height="90" />
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="edge-unsafe-medical-advice-score" dmnElementRef="requirement-unsafe-medical-advice-score">
+        <di:waypoint x="340" y="115" />
+        <di:waypoint x="470" y="315" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="edge-emergency-risk-score" dmnElementRef="requirement-emergency-risk-score">
+        <di:waypoint x="300" y="215" />
+        <di:waypoint x="470" y="315" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="edge-medical-claim-score" dmnElementRef="requirement-medical-claim-score">
+        <di:waypoint x="300" y="315" />
+        <di:waypoint x="470" y="315" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="edge-scam-score" dmnElementRef="requirement-scam-score">
+        <di:waypoint x="250" y="415" />
+        <di:waypoint x="470" y="315" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="edge-toxicity-score" dmnElementRef="requirement-toxicity-score">
+        <di:waypoint x="250" y="515" />
+        <di:waypoint x="470" y="315" />
+      </dmndi:DMNEdge>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>
