@@ -1,6 +1,8 @@
+import json
 from collections.abc import AsyncIterator
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.responses import StreamingResponse
 
 from app.agents import (
     ContentSignalAgent,
@@ -65,6 +67,15 @@ async def moderate_content(
     moderation_request: ModerationRequest,
     moderation_service: ModerationService = Depends(get_moderation_service),
 ) -> ModerationResponse:
+    print(
+        "moderation_request_received",
+        {
+            "text_length": len(moderation_request.text),
+            "has_image": bool(moderation_request.image_url),
+            "metadata_keys": sorted(moderation_request.metadata.keys()),
+        },
+        flush=True,
+    )
     try:
         return await moderation_service.moderate(moderation_request)
     except KogitoClientError as exc:
@@ -74,6 +85,38 @@ async def moderate_content(
         ) from exc
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/contents/moderate/stream")
+async def stream_moderate_content(
+    moderation_request: ModerationRequest,
+    moderation_service: ModerationService = Depends(get_moderation_service),
+) -> StreamingResponse:
+    async def stream_events() -> AsyncIterator[str]:
+        yield ": connected\n\n"
+        try:
+            async for event in moderation_service.moderate_events(moderation_request):
+                yield f"event: moderation\ndata: {json.dumps(event, ensure_ascii=False)}\n\n"
+        except KogitoClientError:
+            yield (
+                "event: moderation\n"
+                f"data: {json.dumps({'stage': 'error', 'status': 'failed', 'error': 'Kogito moderation service is unavailable'}, ensure_ascii=False)}\n\n"
+            )
+        except ValueError as exc:
+            yield (
+                "event: moderation\n"
+                f"data: {json.dumps({'stage': 'error', 'status': 'failed', 'error': str(exc)}, ensure_ascii=False)}\n\n"
+            )
+
+    return StreamingResponse(
+        stream_events(),
+        headers={
+            "Cache-Control": "no-cache, no-transform",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+        media_type="text/event-stream",
+    )
 
 
 @router.get("/contents/{content_id}/moderation", response_model=ModerationResponse)

@@ -9,6 +9,16 @@ from google.genai import types
 
 DEFAULT_MODEL = "gemini-2.5-flash"
 SYSTEM_USER_ID = "system"
+TEXT_SCORE_VALUES = {
+    "NONE": 0.0,
+    "NO": 0.0,
+    "LOW": 0.2,
+    "MEDIUM": 0.5,
+    "MODERATE": 0.5,
+    "HIGH": 0.9,
+    "VERY_HIGH": 1.0,
+    "CRITICAL": 1.0,
+}
 
 
 class JsonAdkAgent:
@@ -78,7 +88,30 @@ def require_text(value: str, field_name: str) -> str:
 
 
 def clamp_score(value: Any) -> float:
-    return max(0.0, min(1.0, float(value or 0.0)))
+    return max(0.0, min(1.0, parse_score(value)))
+
+
+def parse_score(value: Any) -> float:
+    if value is None or value == "":
+        return 0.0
+    if isinstance(value, str):
+        return parse_text_score(value)
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def parse_text_score(value: str) -> float:
+    normalized_value = value.strip().upper().replace("-", "_").replace(" ", "_")
+    if normalized_value.endswith("%"):
+        return float(normalized_value.removesuffix("%")) / 100
+    if normalized_value in TEXT_SCORE_VALUES:
+        return TEXT_SCORE_VALUES[normalized_value]
+    try:
+        return float(normalized_value)
+    except ValueError:
+        return 0.0
 
 
 def string_list(value: Any) -> list[str]:

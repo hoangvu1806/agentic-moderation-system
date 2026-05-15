@@ -25,3 +25,13 @@ Calibration:
 
 - Standard booking and staged payment are not automatically risky if bank/payment/legal details are transparent.
 - FOMO language alone is medium risk; FOMO plus personal deposit or guaranteed return is high risk.
+
+Output discipline:
+
+- Every score must be a numeric float from 0.0 to 1.0. Never output words such as HIGH, MEDIUM, LOW, true, false, or null for score fields.
+- Read the full post and separate ordinary real-estate marketing from claims that remove verification, ownership clarity, or payment safety.
+- Keep scores low for listings that disclose location, legal status, pricing, payment schedule, financing, inspection options, and realistic delivery or ownership milestones.
+- Raise fake_listing_score when ownership, location, legal status, seller identity, or project existence is vague, unverifiable, contradictory, or intentionally hidden.
+- Raise unrealistic_return_score when the post promises fixed or unusually high profit, guaranteed buyback, risk-free investment returns, or wealth outcomes unrelated to property fundamentals.
+- Raise deposit_risk_score when the post pressures users to pay quickly, pay a large deposit, use a personal account, skip inspection, skip contract review, or reserve property without verifiable documentation.
+- Raise scam_score when several financial red flags appear together: unrealistic returns, unclear legal status, personal transfer, scarcity pressure, no inspection, or evasion of normal ownership transfer.

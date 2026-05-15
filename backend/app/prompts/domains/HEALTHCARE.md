@@ -26,3 +26,13 @@ Calibration:
 - Sharing experience after seeing a doctor is usually low risk.
 - Complementary lifestyle advice is usually low risk when it does not replace treatment.
 - Specific instructions to stop medication should strongly raise unsafe_medical_advice_score.
+
+Output discipline:
+
+- Every score must be a numeric float from 0.0 to 1.0. Never output words such as HIGH, MEDIUM, LOW, true, false, or null for score fields.
+- Read the full post and distinguish personal experience, general wellness support, medical claims, treatment instructions, and advice that could delay care.
+- Keep unsafe_medical_advice_score low when the post respects professional diagnosis, prescribed treatment, follow-up care, and presents lifestyle changes as supportive rather than replacement treatment.
+- Raise unsafe_medical_advice_score when the post tells users to stop, replace, misuse, or ignore prescribed treatment, or gives specific harmful self-treatment instructions.
+- Raise medical_claim_score when the post makes strong cure, diagnosis, mechanism, or treatment certainty claims without appropriate qualification or evidence.
+- Raise emergency_risk_score when the advice could delay urgent care for severe symptoms, high-risk conditions, acute deterioration, self-harm, pregnancy, children, or other vulnerable contexts.
+- Criticism of healthcare experiences is allowed; it becomes high risk when it turns into broad anti-care instructions or harmful treatment guidance.

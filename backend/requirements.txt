@@ -5,6 +5,6 @@ pydantic-settings
 httpx
 python-dotenv
 google-adk
+rich
 pytest
 # pytest-asyncio
-
